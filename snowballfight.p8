@@ -352,7 +352,7 @@ function spart:new(x,y,z,dx,dy,dz)
 	o.dy = dy
 	o.dz = dz
 	
-	o.frames_left = random_int(10,300)
+	o.frames_left = random_int(40,300)
 	
 	return o
 end
@@ -365,8 +365,6 @@ function spart:update()
 	self.y += self.dy
 	self.dz +=	self.grav
 	self.z += self.dz
-	
-	log(self.x .. "," .. self.y .. "," .. self.z)
 	
 	if (self.z <= 0) do
 		self.z = 0
@@ -413,10 +411,6 @@ function snowball:update()
 	if (self.z <= 0) then
 		if (self.dz ~= self.grav) then
 			self:splat()
-			self:splat()
-			self:splat()
-			self:splat()
-			self:splat()
 		end
 		self.z = 0
 		self.dx = 0
@@ -430,13 +424,15 @@ function snowball:update()
 end
 
 function snowball:splat()	
-	add(
-		self.particles, 
-		spart:new(
-			self.x, self.y, self.z,
-			self.dx/2 + random(0,0.2), self.dy/2 + random(0,0.2), 1.2 + random(-1,1)
+	for i=1,random_int(2,16),1 do
+		add(
+			self.particles, 
+			spart:new(
+				self.x, self.y, self.z,
+				self.dx/2 + random(-0.4,0.4), self.dy/2 + random(-0.4,0.4), 1.2 + random(-1,1)
+			)
 		)
-	)
+	end
 end
 
 function snowball:is_down()
