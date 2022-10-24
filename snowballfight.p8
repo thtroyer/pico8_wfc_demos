@@ -8,10 +8,8 @@ __lua__
 -- global lists
 players = {}
 snowballs = {}
-cars = {}
 
 -- global timers
-car_timer = nil
 title_screen_timer = nil
 
 -- global state
@@ -92,7 +90,6 @@ function _init()
 	add(players, player:new(10,rnd(20)+20,1))
 	add(players, player:new(5,rnd(20)+40,2)) 
 	
-	car_timer = random(1*30, 3*30)
 end
 
 function _update()
@@ -132,7 +129,6 @@ function _draw()
 	map()
 	foreach(snowballs, function(o) o:draw() end)
 	foreach(players, function(o) o:draw() end)
-	--foreach(cars, function(o) o:draw() end)
 end
 
 -->8
@@ -272,32 +268,6 @@ function player:move(mov_x, mov_y)
 		self.x = 130
 	elseif self.x < -8 then 
 		self.x = -8
-	end
-end
-
-function player:pickup(trashes)
-	if (self.trash_obj != nil) then
-		self.trash_obj = nil
-		sfx(1)
-		return
-	end
-
-	for i,trash in pairs(trashes) do
-		if (trash.x > (self.x-8)) and (trash.x < (self.x+8)) then
-			if (trash.y > (self.y-8)) and (trash.y < (self.y+8)) then
-				self.trash_obj = trash
-				sfx(2)
-				break
-			end
-		end
-	end
-end
-
-function player:run_over()
-	if self.hit_timer == nil then
-		sfx(3)
-		self.hit_timer = 150
-		self.hearts -= 1
 	end
 end
 
