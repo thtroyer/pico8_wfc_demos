@@ -422,6 +422,13 @@ function snowball:update()
 	for p in all(self.particles) do
 		p:update()
 	end
+	
+	if random_int(0,100) <= 4 then
+		add(self.particles, 
+			spart:new(self.x, self.y, self.z,
+				self.dx/2, self.dy/2, self.dz)
+		)
+	end
 end
 
 function snowball:splat()	
