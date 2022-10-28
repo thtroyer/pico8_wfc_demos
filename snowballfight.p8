@@ -8,6 +8,7 @@ __lua__
 -- global lists
 players = {}
 snowballs = {}
+snowmen = {}
 
 -- global timers
 title_screen_timer = nil
@@ -90,13 +91,20 @@ function update_players()
 	end
 end
 
+function update_snowmen()
+	for s in all(snowmen) do
+		s:update()
+	end
+end
+
 -- pico-8 hooks
 function _init()
 --	title_screen = true
 --	draw_title_screen()
 	add(players, player:new(10,rnd(20)+20,1))
 	add(players, player:new(5,rnd(20)+40,2)) 
-	
+	add(snowmen, snowman:new())
+	add(snowmen, snowman:new())
 end
 
 function _update()
@@ -117,6 +125,7 @@ function _update()
 	handle_controllers()
 	update_players()
 	update_snowballs()
+	update_snowmen()
 
 end
 
@@ -137,6 +146,7 @@ function _draw()
 	cls()
 	map()
 	foreach(snowballs, function(o) o:draw() end)
+	foreach(snowmen, function(o) o:draw() end)
 	foreach(players, function(o) o:draw() end)
 end
 
@@ -284,9 +294,9 @@ function player:throw_snowball()
 		return
 	end
 	
-	self.throw_timer = 30
+	self.throw_timer = 13
 	
-	local s = snowball:new(self.x, self.y)
+	local s = snowball:new(self.x, self.y+2)
 	
 	--if (sub(self.looking_dir, 2, 2) == "⬅️") then
 	if (self.looking_dir == "⬅️") then
@@ -447,7 +457,28 @@ end
 
 -->8
 -- snowman target
+snowman = {}
 
+function snowman:new()
+	local o = {}
+	setmetatable(o,self)
+	self.__index = self
+	
+	o.x = random_int(64,120)
+	o.y = random_int(20,114)
+	o.health = 100
+	
+	return o
+end
+
+function snowman:update()
+end
+
+function snowman:draw()
+	spr(42,
+		self.x, self.y,
+		1, 2)
+end
 __gfx__
 00000000000ccc000008880000000000000000000000000000000000000000000000000000000000000000000000000000008888888800000000222222220000
 0000000000c4ffc0008aff8000000000000000000000000000000000000000000000000000000000000000000000000000888888888888000022222222222200
