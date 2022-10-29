@@ -97,6 +97,62 @@ function update_snowmen()
 	end
 end
 
+function collide(x1,x1s,y1,y1s,x2,x2s,y2,y2s)
+	log("debug")
+	log(x1)
+	log(x1s)
+	log(y1)
+	log(y1s)
+	
+	if((x1+x1s) > x2) and ((x2+x2s) > x1) then
+		log("x hit")
+	end
+
+	if((y1+y1s) > y2) and ((y2+y2s) > y1) then
+		log("y hit")
+	end
+	
+	if((x1+x1s) > x2) and ((x2+x2s) > x1) then
+		if((y1+y1s) > y2) and ((y2+y2s) > y1) then
+			return true
+		end
+	end
+	return false
+	
+	--	if (player.x+8 > self.x) and (self.x+16 > player.x) then
+		--	if (player.y+5 > self.y) and (self.y+31 > player.y) then
+		--		player:run_over()
+		--	end
+	--	end
+end
+
+function entitycollide(e1,e2)
+	return collide(
+		e1.x+e1.xoff,
+		e1.xsize,
+		e1.y+e1.xoff,
+		e1.ysize,
+		e2.x+e2.xoff,
+		e2.xsize,
+		e2.y+e2.xoff,
+		e2.ysize)
+	end
+
+function detect_collisions()
+	for s in all(snowballs) do
+		if (s.active) then
+			for t in all(snowmen) do
+				--if collide(s.x+4,1,s.y+4,1,t.x,8,t.y,8) then
+				if(entitycollide(s,t)) then
+					s:hit()
+					t:hit()
+					log("hit!")
+				end
+			end
+		end
+	end
+end
+
 -- pico-8 hooks
 function _init()
 --	title_screen = true
@@ -126,7 +182,7 @@ function _update()
 	update_players()
 	update_snowballs()
 	update_snowmen()
-
+	detect_collisions()
 end
 
 function draw_title_screen()
@@ -394,6 +450,12 @@ function snowball:new(x, y)
 	o.dy = 0
 	o.dz = 0
 	o.grav = -0.5
+	o.active = true
+	
+	o.xoff = 4
+	o.yoff = 4
+	o.xsize = 2
+	o.ysize = 2
 	
 	o.frames_left = random_int(300,600)
 	o.particles = {}
@@ -432,6 +494,8 @@ function snowball:update()
 end
 
 function snowball:splat()	
+	if (not active) return
+	
 	for i=1,random_int(2,16),1 do
 		add(
 			self.particles, 
@@ -441,6 +505,42 @@ function snowball:splat()
 			)
 		)
 	end
+	self.active = false
+end
+
+function snowball:hit()
+	local xpos = 1
+	local xneg = -1
+	local ypos = 1
+	local yneg = -2
+	
+	if(self.dx>1) then
+		xpos=0
+	elseif (self.dx < 1) then
+		xneg = 0
+	end
+	if(self.dy>1) then
+		ypos=0
+	elseif (self.dy < 1) then
+		yneg = 0
+	end
+		
+	
+	for i=1,random_int(5,8),1 do
+		add(
+			self.particles, 
+			spart:new(
+				self.x, self.y, self.z,
+				random(xneg,xpos), 
+				random(yneg,ypos), 
+				1 + random(-.5,.5)
+			)
+		)
+	end
+	self.active = false
+	self.dx = 0
+	self.dy = 0
+	self.dz = 0
 end
 
 function snowball:is_down()
@@ -471,6 +571,11 @@ function snowman:new()
 	setmetatable(o,self)
 	self.__index = self
 	
+	o.xoff = 0
+	o.yoff = 0
+	o.xsize = 8
+	o.ysize = 12
+	
 	o.x = random_int(64,120)
 	o.y = random_int(20,114)
 	o.health = 100
@@ -479,8 +584,16 @@ function snowman:new()
 	return o
 end
 
+function snowman:checkcollision(snowball)
+--	if(
+end
+
+function snowman:hit()
+	self.health -= 10
+end
+
 function snowman:update()
-	self.health -= 1
+	--self.health -= 1
 end
 
 function snowman:draw()
@@ -492,11 +605,14 @@ function snowman:draw()
 	if (h <= 30 and h > 0) sprite = 45
 	if (h <= 0) sprite = 46
 	spr(sprite,
-		self.x, self.y,
+		self.x, self.y-8,
 		1, 2,
 		self.flipx)
 	
 end
+-->8
+
+
 __gfx__
 00000000000ccc000008880000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 0000000000c4ffc0008aff8000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
