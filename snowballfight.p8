@@ -97,24 +97,14 @@ function update_snowmen()
 	end
 end
 
-function collide(x1,x1s,y1,y1s,x2,x2s,y2,y2s)
-	log("debug")
-	log(x1)
-	log(x1s)
-	log(y1)
-	log(y1s)
+function collide(x1,x1s,y1,y1s,z1,z1s,x2,x2s,y2,y2s,z2,z2s)
 	
-	if((x1+x1s) > x2) and ((x2+x2s) > x1) then
-		log("x hit")
-	end
-
-	if((y1+y1s) > y2) and ((y2+y2s) > y1) then
-		log("y hit")
-	end
 	
 	if((x1+x1s) > x2) and ((x2+x2s) > x1) then
 		if((y1+y1s) > y2) and ((y2+y2s) > y1) then
-			return true
+			if((z1+z1s) > z2) and ((z2+z2s) > z1) then
+				return true
+			end
 		end
 	end
 	return false
@@ -132,11 +122,29 @@ function entitycollide(e1,e2)
 		e1.xsize,
 		e1.y+e1.xoff,
 		e1.ysize,
+		e1.z,
+		e1.zsize,
+		e2.x+e2.xoff,
+		e2.xsize,
+		e2.y+e2.xoff,
+		e2.ysize,
+		e2.z,
+		e2.zsize
+	)
+end
+	
+--deprecated
+function entitycollide_bak(e1,e2)
+	return collide(
+		e1.x+e1.xoff,
+		e1.xsize,
+		e1.y+e1.xoff,
+		e1.ysize,
 		e2.x+e2.xoff,
 		e2.xsize,
 		e2.y+e2.xoff,
 		e2.ysize)
-	end
+end
 
 function detect_collisions()
 	for s in all(snowballs) do
@@ -144,9 +152,21 @@ function detect_collisions()
 			for t in all(snowmen) do
 				--if collide(s.x+4,1,s.y+4,1,t.x,8,t.y,8) then
 				if(entitycollide(s,t)) then
-					s:hit()
 					t:hit()
-					log("hit!")
+					s:hit()
+				end
+			end
+		end
+	end
+	
+	for s in all(snowballs) do
+		if (s.active) then
+			for p in all(players) do
+				if(entitycollide(p,s)) then
+					if(s.thrower ~= p) then
+						p:hit(s)
+						s:hit()
+					end
 				end
 			end
 		end
@@ -218,6 +238,16 @@ function player:new(x,y,player_id)
 	o.y = y or 20
 	o.dx = 0
 	o.dy = 0
+	o.z = 0
+	o.xsize=8
+	o.ysize=8
+	o.zsize = 15
+	o.xoff=0
+	o.yoff=0
+	o.zoff=0
+	o.hitdx=0
+	o.hitdy=0
+	
 	o.looking_dir = "⬇️"
 	o.walk_timer = nil
 	o.walk_state = 0
@@ -352,7 +382,7 @@ function player:throw_snowball()
 	
 	self.throw_timer = 13
 	
-	local s = snowball:new(self.x, self.y+2)
+	local s = snowball:new(self.x, self.y+2, self)
 	
 	--if (sub(self.looking_dir, 2, 2) == "⬅️") then
 	if (self.looking_dir == "⬅️") then
@@ -371,7 +401,7 @@ function player:throw_snowball()
 		s.dx = random(-.15,.15)
 	end
 	
-	s.dz = 5
+	s.dz = 2.5
 
 	return s
 end
@@ -383,7 +413,27 @@ function player:draw_hearts()
 	end
 end
 
+function player:hit(snowball)
+	self.hitdx += (snowball.dx/2)
+	self.hitdy += (snowball.dy/2)
+end
+
+function sign(x)
+	return x/abs(x)
+end
+
 function player:update()
+	--log("hitdx: ")
+	--log(self.hitdx)
+	--log("hitdy: ")
+	--log(self.hitdy)
+	self.x += self.hitdx
+	self.y += self.hitdy
+	
+	self.hitdx -= sign(self.hitdx) * .5
+	self.hitdy -= sign(self.hitdy) * .5
+	if(self.hitdx < 0.1) self.hitdx = 0
+	if(self.hitdy < 0.1) self.hitdy = 0
 	
 	if not (self.throw_timer == nil) then
 		self.throw_timer -= 1
@@ -435,7 +485,7 @@ function spart:draw()
 	pset(self.x+4, self.y+4 - (self.z/2), 7)
 end
 
-function snowball:new(x, y)
+function snowball:new(x, y, thrower)
 	local o = {}
 	setmetatable(o,self)
 	self.__index = self
@@ -449,13 +499,16 @@ function snowball:new(x, y)
 	o.dx = 0
 	o.dy = 0
 	o.dz = 0
-	o.grav = -0.5
+	o.grav = -0.25
 	o.active = true
 	
 	o.xoff = 4
 	o.yoff = 4
 	o.xsize = 2
 	o.ysize = 2
+	o.zsize = 2
+	
+	o.thrower = thrower
 	
 	o.frames_left = random_int(300,600)
 	o.particles = {}
@@ -464,6 +517,10 @@ function snowball:new(x, y)
 end
 
 function snowball:update()
+	if (self.active == true) then
+		log("update")
+		log(self.dx)
+	end
 	self.frames_left -= 1
 	if (self.frames_left == 0) return
 
@@ -475,6 +532,7 @@ function snowball:update()
 		if (self.dz ~= self.grav) then
 			self:splat()
 		end
+		--log("ground")
 		self.z = 0
 		self.dx = 0
 		self.dy = 0
@@ -485,7 +543,7 @@ function snowball:update()
 		p:update()
 	end
 	
-	if random_int(0,100) <= 4 then
+	if random_int(0,100) <= 2 then
 		add(self.particles, 
 			spart:new(self.x, self.y, self.z,
 				self.dx/2, self.dy/2, self.dz)
@@ -494,9 +552,9 @@ function snowball:update()
 end
 
 function snowball:splat()	
-	if (not active) return
+	if (not self.active) return
 	
-	for i=1,random_int(2,16),1 do
+	for i=1,random_int(10,16),1 do
 		add(
 			self.particles, 
 			spart:new(
@@ -512,16 +570,16 @@ function snowball:hit()
 	local xpos = 1
 	local xneg = -1
 	local ypos = 1
-	local yneg = -2
+	local yneg = -1
 	
 	if(self.dx>1) then
 		xpos=0
-	elseif (self.dx < 1) then
+	elseif (self.dx < -1) then
 		xneg = 0
 	end
 	if(self.dy>1) then
 		ypos=0
-	elseif (self.dy < 1) then
+	elseif (self.dy < -1) then
 		yneg = 0
 	end
 		
@@ -538,6 +596,7 @@ function snowball:hit()
 		)
 	end
 	self.active = false
+	log("snowball hit")
 	self.dx = 0
 	self.dy = 0
 	self.dz = 0
@@ -575,6 +634,8 @@ function snowman:new()
 	o.yoff = 0
 	o.xsize = 8
 	o.ysize = 12
+	o.z = 0
+	o.zsize = 30
 	
 	o.x = random_int(64,120)
 	o.y = random_int(20,114)
@@ -585,25 +646,28 @@ function snowman:new()
 end
 
 function snowman:checkcollision(snowball)
---	if(
 end
 
 function snowman:hit()
 	self.health -= 10
+	self.zsize = 30 - (self:states()*3)
 end
 
 function snowman:update()
 	--self.health -= 1
 end
 
-function snowman:draw()
-	sprite = 42
+function snowman:states()
 	local h = self.health
-	if (h >= 90) sprite = 42
-	if (h <= 90 and h > 60) sprite = 43
-	if (h <= 60 and h > 30) sprite = 44
-	if (h <= 30 and h > 0) sprite = 45
-	if (h <= 0) sprite = 46
+	if (h >= 90) return 0
+	if (h <= 90 and h > 60) return 1
+	if (h <= 60 and h > 30) return 2
+	if (h <= 30 and h > 0) return 3
+	if (h <= 0) return 4
+end
+
+function snowman:draw()
+	sprite = 42 + self:states()
 	spr(sprite,
 		self.x, self.y-8,
 		1, 2,
