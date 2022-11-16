@@ -52,7 +52,6 @@ function handle_controllers()
 		
 		if(btn(🅾️,i-1)) then
 			add(snowballs, player:throw_snowball())
-			log(count(snowballs))
 		end
 	end
 end
@@ -423,10 +422,6 @@ function sign(x)
 end
 
 function player:update()
-	--log("hitdx: ")
-	--log(self.hitdx)
-	--log("hitdy: ")
-	--log(self.hitdy)
 	self.x += self.hitdx
 	self.y += self.hitdy
 	
@@ -517,10 +512,6 @@ function snowball:new(x, y, thrower)
 end
 
 function snowball:update()
-	if (self.active == true) then
-		log("update")
-		log(self.dx)
-	end
 	self.frames_left -= 1
 	if (self.frames_left == 0) return
 
@@ -532,7 +523,6 @@ function snowball:update()
 		if (self.dz ~= self.grav) then
 			self:splat()
 		end
-		--log("ground")
 		self.z = 0
 		self.dx = 0
 		self.dy = 0
@@ -596,7 +586,6 @@ function snowball:hit()
 		)
 	end
 	self.active = false
-	log("snowball hit")
 	self.dx = 0
 	self.dy = 0
 	self.dz = 0
@@ -674,9 +663,6 @@ function snowman:draw()
 		self.flipx)
 	
 end
--->8
-
-
 __gfx__
 00000000000ccc000008880000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 0000000000c4ffc0008aff8000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
