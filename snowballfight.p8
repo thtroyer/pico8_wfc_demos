@@ -1,5 +1,5 @@
 pico-8 cartridge // http://www.pico-8.com
-version 38
+version 39
 __lua__
 --snowball fight!
 --a work in progress
@@ -17,6 +17,37 @@ title_screen_timer = nil
 title_screen = false
 
 -- utility methods
+
+-- converts anything to string, even nested tables
+function tostring(any)
+	if type(any)=="function" then 
+		return "function" 
+	end
+	if any==nil then 
+		return "nil" 
+	end
+	if type(any)=="string" then
+		return any
+	end
+	if type(any)=="boolean" then
+		if any then return "true" end
+		return "false"
+	end
+	if type(any)=="table" then
+		local str = "{ "
+		for k,v in pairs(any) do
+			str=str..tostring(k).."->"..tostring(v).." "
+			--str=str..tostring(k).."->".."n/a".." "
+		end
+		return str.."}"
+	end
+	if type(any)=="number" then
+		return ""..any
+	end
+	return "unknown"
+end
+
+
 function random(minimum, maximum)
 	return rnd(maximum-minimum) + minimum
 end
@@ -187,8 +218,9 @@ function _init()
 	
 	--test
 	--mset(4,4,66)
-	mapgen:new()
+	local mapgen = mapgen:new()
 	mapgen:generate()
+	mapgen:draw()
 end
 
 
@@ -480,7 +512,7 @@ function spart:update()
 	self.dz +=	self.grav
 	self.z += self.dz
 	
-	if (self.z <= 0) do
+	if (self.z <= 0) then
 		self.z = 0
 		self.dx = 0
 		self.dy = 0
@@ -612,7 +644,7 @@ function snowball:draw()
 
 	self.shadow = not self.shadow
 	spr(self.sprite_id, self.x, self.y-(self.z/2))
-	if (self.z ~= 0 and self.shadow) do
+	if (self.z ~= 0 and self.shadow) then
 		spr(20, self.x, self.y)
 	end
 	
@@ -676,74 +708,155 @@ function snowman:draw()
 	
 end
 -->8
--- mapgen
+-- mapdata and mapgen
 mapgen = {}
+mapdata = {}
+
+function mapdata:new()
+	local o = {}
+	setmetatable(o,self)
+	self.__index = self
+	
+	-- list<map_tiles>
+	o.map_tiles = {} 
+	log("mapdata:new()")
+	return o
+end
+
+
+function mapdata:initialize()
+	local map_tiles = {}
+
+	log("generating map tiles")
+	for y=0,15 do
+		for x=0,15 do
+			log(x..","..y)
+			log(x+y*16)
+			log("adding " .. x+y*16)
+			map_tiles[x+y*16] = maptile:new(64,65)
+			map_tiles[x+y*16].x = x
+			map_tiles[x+y*16].y = y
+			map_tiles[x+y*16]:add(65)
+			map_tiles[x+y*16]:add(64)
+			map_tiles[x+y*16]:add(70)
+		end
+		log(tostring(map_tiles))
+	end
+	self.map_tiles = map_tiles
+end
+
+-- x: int, y: int
+-- returns map_tile
+function mapdata:get_maptile(x,y)
+	return self.map_tiles[x+y*16]
+end
+
+-- x: int, y: int
+-- returns list<map_tile>
+function mapdata:get_maptile_neighbors(x,y)
+	function add_if_notnil(list, i)
+		if (not (i == nil)) then
+			add(list, i)
+		end
+		return list
+	end
+	
+	neighbors = {}
+	neighbors = add_if_notnil(self.get_maptile(x+1,y))
+	neighbors = add_if_notnil(self.get_maptile(x-1,y))
+	neighbors = add_if_notnil(self.get_maptile(x,y+1))
+	neighbors = add_if_notnil(self.get_maptile(x,y-1))
+	return neighbors
+end
+
+-- find tiles with lowest entropy
+-- returns list<maptile>
+function mapdata:lowest()
+	local lowest_entropy = 9999
+	local l_list = {}
+	
+	for t in all(self.map_tiles) do
+		if not t:is_collapsed() then		
+			local ent = t:entropy()
+			if ent == lowest_entropy then
+				add(l_list, t)
+			elseif ent < lowest_entropy then
+				lowest_entropy = ent
+				l_list = {}
+				add(l_list, t)
+			end
+		end
+	end
+	
+	log("found " .. count(l_list))
+	return l_list
+end
+
+	--todo: cleanup below
+	-- keep migrating to use mapobj
 
 function mapgen:new()
 	local o = {}
 	setmetatable(o,self)
 	self.__index = self
 	
-	r = rules:new()
+	local r = rules:new()
 	r:add_neighbors(65,65)
 	r:add_neighbors(64,65)
 	r:add_neighbors(64,64)
 	r:add_neighbors(64,70)
 	r:add_neighbors(70,70)
-	self.rules = r
+	o.rules = r
+	o.map_tiles = {}
 	
+	o.mapdata = mapdata:new()
 	return o
 end
 
 function mapgen:generate()
-	local map_tiles = {}
-	tiles = {}
-	add(tiles,64)
-	add(tiles,65)
+	log("mapgen:generate()")
+	self:initialize()
+	self:collapse()
+end
 
-	log("generating map tiles")
-	for y=0,15,1 do
-		for x=0,15,1 do
-			log(x..","..y)
-			log(x+y*15)
-			log("adding " .. x+y*15)
-			map_tiles[x+y*15] = maptile:new(64,65)
-			map_tiles[x+y*15].x = x
-			map_tiles[x+y*15].y = y
-			map_tiles[x+y*15]:add(65)
-			map_tiles[x+y*15]:add(64)
-			map_tiles[x+y*15]:add(70)
-		end
-	end
+function mapgen:initialize()
+	self.mapdata:initialize()
+end
 	
-	resolved = false
-	while (not resolved) do
+function mapgen:collapse()
+	log("mapgen:collapse()")
+	local resolved = false
+	local low_tiles = self.mapdata:lowest()
+	log("low tiles")
+	log(tostring(low_tiles))
+
+	while not(#low_tiles == 0) do
+		log("low tiles")
+		log(tostring(low_tiles))
+		
 		-- find lowest entropy
-		low_ent_tile = self:lowest(map_tiles)
+		local low_ent_tile = rnd(low_tiles)
 		log("collapsing tile " .. low_ent_tile.x .. ", " .. low_ent_tile.y)
 		low_ent_tile:collapse()
 		
 		-- propogate tile changes
-		self:propogate(map_tiles, low_ent_tile)
+		self:propogate(low_ent_tile)
 
 		self:print_all_states(map_tiles)
-		-- check resolved
-		resolved = true
-		for t in all(map_tiles) do
-			if not t:is_collapsed() then
-				resolved = false
-			end
-		end
+		
+		low_tiles = self.mapdata:lowest()
 	end
-	
+end
+
+function mapgen:draw()
 	log("drawing map")
+	local map_tiles = self.mapdata.map_tiles
 	-- draw map
 	for x=0,15,1 do
 		for y=0,15,1 do
 			log(x .. ", " .. y)
-			log(map_tiles[x+y*15].tile)
---			log(map_tiles[x+y*15].x)
-			mset(x,y,map_tiles[x+y*15].tile)
+			log(map_tiles[x+y*16].tile)
+			mset(x,y,map_tiles[x+y*16].tile)
 		end
 	end
 end
@@ -759,28 +872,7 @@ function mapgen:print_all_states(tiles)
 	end
 end
 
-function mapgen:lowest(tiles)
-	local lowest_entropy = 9999
-	local l_list = {}
-	
-	for t in all(tiles) do
-		if not t:is_collapsed() then		
-			local ent = t:entropy()
-			if ent == lowest_entropy then
-				add(l_list, t)
-			elseif ent < lowest_entropy then
-				lowest_entropy = ent
-				l_list = {}
-				add(l_list, t)
-			end
-		end
-	end
-	
-	log("found " .. count(l_list))
-	return rnd(l_list)
-end
-
-function mapgen:propogate(tiles, affected_tile)
+function mapgen:propogate(affected_tile)
 
 	x = affected_tile.x
 	y = affected_tile.y
@@ -788,6 +880,7 @@ function mapgen:propogate(tiles, affected_tile)
 	log("collapsed " .. x .. ", " .. y)
 	log("propogating...")
 	log("tiles:")
+	local tiles = self.mapdata.map_tiles
 	log(tiles)
 	self.rules:propogate(affected_tile, tiles, x+1, y)
 	self.rules:propogate(affected_tile, tiles, x-1, y)
@@ -875,15 +968,16 @@ function rules:add_neighbors(tile1, tile2)
 	add(self.list_of_nbrs, neighbors)
 end
 
+-- todo: rework propogate to 
 function rules:propogate(source, tiles, x, y)
 	log("propogating changes to "..x..","..y)
-	neighbor = tiles[x+y*15]
+	neighbor = tiles[x+y*16]
 	if (neighbor == nil) then
 		log("neighbor not found")
 		return
 	end
 	
-	local tiles_to_rm = {}
+	local states_to_rm = {}
 	
 	for tn in all(neighbor.list_of_tiles) do
 		local change = true
@@ -899,13 +993,13 @@ function rules:propogate(source, tiles, x, y)
 			log("deleting from " .. neighbor.x .. ", " .. neighbor.y .. "; " .. tn)
 			--del(neighbor.list_of_tiles, tn)
 			--neighbor:remove(tn)
-			add(tiles_to_rm, tn)
+			add(states_to_rm, tn)
 		end
 	end
 	
 	log("bork2")
-	log(count(tiles_to_rm))
-	for t in all(tiles_to_rm) do
+	log(count(states_to_rm))
+	for t in all(states_to_rm) do
 		log("bork")
 		neighbor:remove(t)
 	end
