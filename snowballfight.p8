@@ -859,13 +859,13 @@ function mapgen:collapse()
 end
 
 function mapgen:draw()
-	log("drawing map")
+	--log("drawing map")
 	local map_tiles = self.mapdata.map_tiles
 	-- draw map
 	for x=0,15,1 do
 		for y=0,15,1 do
-			log(x .. ", " .. y)
-			log(map_tiles[x+y*16].tile)
+--			log(x .. ", " .. y)
+--			log(map_tiles[x+y*16].tile)
 			mset(x,y,map_tiles[x+y*16].tile)
 		end
 	end
@@ -954,6 +954,13 @@ function maptile:collapse()
 		return
 	end
 	self.tile = rnd(self.list_of_tiles)
+	
+	-- draw once collapsed
+	cls()
+	mset(self.x,self.y,self.tile)
+	map()
+	log("mset " .. self.x .. "," .. self.y .. " as " .. self.tile)
+	
 	self.list_of_tiles = {}
 	add(self.list_of_tiles, self.tile)
 	log("tile: " .. self.tile)
