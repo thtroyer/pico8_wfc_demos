@@ -63,14 +63,10 @@ function mapgen:collapse()
 end
 
 function mapgen:draw()
-	--log("drawing map")
 	local map_tiles = self.mapdata.map_tiles
-	-- draw map
 	for x = 0,15, 1 do
 		for y = 0, 15, 1 do
-		--			log(x .. ", " .. y)
-		--			log(map_tiles[x+y*16].tile)
-		mset(x, y, map_tiles[x+y*16].tile)
+			mset(x, y, map_tiles[x+y*16].tile)
 		end
 	end
 end

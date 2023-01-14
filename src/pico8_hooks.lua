@@ -21,7 +21,6 @@ function _update()
 	detect_collisions()
 end
 
-
 function _draw()
 	-- unused
 	if title_screen then

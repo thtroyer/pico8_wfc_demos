@@ -19,7 +19,10 @@ function handle_controllers()
 		player:move(mov_x, mov_y)
 
 		if (btn(🅾️, i-1)) then
-	add(snowballs, player:throw_snowball())
+			add(snowballs, player:throw_snowball())
+		end
+		if (btn(❎, i-1)) then
+			run()
 		end
 	end
 end
@@ -32,9 +35,9 @@ function title_controllers()
 	if (btnp(❎, 0)
 			or btnp(❎, 1)
 			or btnp(🅾️, 0)
-	or btnp(🅾️,1)) then
-	title_timer = 30
-	sfx(1)
+			or btnp(🅾️,1)) then
+		title_timer = 30
+		sfx(1)
 	end
 end
 
@@ -92,19 +95,6 @@ function entitycollide(e1, e2)
 	)
 end
 
---deprecated
-function entitycollide_bak(e1, e2)
-	return collide(
-			e1.x + e1.xoff,
-			e1.xsize,
-			e1.y + e1.xoff,
-			e1.ysize,
-			e2.x + e2.xoff,
-			e2.xsize,
-			e2.y + e2.xoff,
-			e2.ysize)
-end
-
 function detect_collisions()
 	for s in all(snowballs) do
 		if (s.active) then
@@ -134,8 +124,8 @@ end
 -- currently unused
 function draw_title_screen()
 	cls()
-	print('snowball fight!', 26, 16, 0)
-	print('snowball fight!', 25, 15, 7)
+	print('title!', 26, 16, 0)
+	print('title!', 25, 15, 7)
 	print('press ❎ / 🅾️', 39, 116, 0)
 	print('press ❎ / 🅾️', 38, 115, 7)
 end
