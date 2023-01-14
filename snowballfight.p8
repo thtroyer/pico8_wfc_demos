@@ -4,11 +4,47 @@ __lua__
 --snowball fight!
 --a work in progress
 
--- utility methods
-#include utility.lua
+-- global lists
+players = {}
+snowballs = {}
+snowmen = {}
 
--- everything else
-#include code.lua
+-- global timers
+title_screen_timer = nil
+
+-- global state
+title_screen = false
+
+-- utility methods
+#include src/utility.lua
+
+#include src/global_game_logic.lua
+
+#include src/pico8_hooks.lua
+
+-->8
+#include src/entities/player.lua
+
+-->8
+#include src/entities/spart.lua
+#include src/entities/snowball.lua
+
+-->8
+#include src/entities/snowman.lua
+
+-->8
+#include src/map/mapdata.lua
+
+-->8
+#include src/map/mapgen.lua
+
+-->8
+#include src/map/maptile.lua
+
+-->8
+-- rules
+#include src/map/neighbor_rules.lua
+
 
 __gfx__
 00000000000ccc000008880000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
