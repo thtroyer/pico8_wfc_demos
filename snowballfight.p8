@@ -3,6 +3,11 @@ version 39
 __lua__
 --snowball fight!
 --a work in progress
+
+-- utility methods
+#include utility.lua
+
+-- everything else
 #include code.lua
 
 __gfx__
