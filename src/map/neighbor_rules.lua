@@ -23,7 +23,7 @@ end
 
 -- tile1 : int -- refers to sprite #
 -- tile2 : int -- refers to sprite #
--- direction : int -- refers to a neightbor_rules_const value
+-- direction : int -- refers to a neighbor_rules_const value
 function neighbor_rules:add_neighbors(tile1, tile2, direction)
 	local neighbors = {}
 	add(neighbors, tile1)
@@ -49,33 +49,60 @@ end
 -- mapdata:mapdata
 -- returns void
 function neighbor_rules:propogate(source, mapdata)
-	log("rules above " .. tostring(self.list_of_neighbors_above))
-	log("rules below " .. tostring(self.list_of_neighbors_below))
-	log("rules right " .. tostring(self.list_of_neighbors_right))
-	log("rules left " .. tostring(self.list_of_neighbors_left))
+	-- log("rules above " .. tostring(self.list_of_neighbors_above))
+	-- log("rules below " .. tostring(self.list_of_neighbors_below))
+	-- log("rules right " .. tostring(self.list_of_neighbors_right))
+	-- log("rules left " .. tostring(self.list_of_neighbors_left))
 	local x = source.x
 	local y = source.y
 	local tiles = mapdata.map_tiles
 
-	self:ortho(source, tiles, tiles[(x+1)+y*16], neighbor_rules_const.right)
-	self:ortho(source, tiles, tiles[(x-1)+y*16], neighbor_rules_const.left)
-	self:ortho(source, tiles, tiles[x+(y+1)*16], neighbor_rules_const.above)
-	self:ortho(source, tiles, tiles[x+(y-1)*16], neighbor_rules_const.below)
+	-- todo: propogating recursively isn't working quite right yet
+	if not (x >= 15) then
+		if (self:ortho(source, tiles, tiles[(x+1)+y*16], neighbor_rules_const.right)) then
+			-- self:propogate(tiles[(x+1)+y*16], mapdata)
+		end
+	end
+	
+	if not (x <= 0) then
+		if(self:ortho(source, tiles, tiles[(x-1)+y*16], neighbor_rules_const.left)) then
+			-- self:propogate(tiles[(x-1)+y*16], mapdata)
+		end
+	end
+
+	if not (y >= 15) then
+		if (self:ortho(source, tiles, tiles[x+(y+1)*16], neighbor_rules_const.above)) then
+			-- self:propogate(tiles[x+(y+1)*16], mapdata)
+		end
+	end
+
+	if not (y <= 15) then
+		if(self:ortho(source, tiles, tiles[x+(y-1)*16], neighbor_rules_const.below)) then
+			-- self:propogate(tiles[x+(y-1)*16], mapdata)
+		end
+	end
+
 end
 
 -- update tiles param based on changes in source tile
 -- 
 -- source : map_tile
 -- tiles : list<map_tile>
--- x : int, y : int
+-- neighbor : map_tile
 -- rules_const : int -- which rules to check
--- return void
-function neighbor_rules:ortho(source, tiles, neighbor, rule_const)
-	log("propogating changes to "..x..","..y)
-	if (neighbor == nil) then
-		log("neighbor not found")
+-- return boolean -- whether neighbor was updated
+function neighbor_rules:ortho(source, tiles, target, rule_const)
+	-- log("propogating changes to "..x..","..y)
+	if (target == nil) then
+		log("target not found")
 		return
 	end
+
+	log("propogating changes to "..target.x..","..target.y)
+
+	log(tostring(target))
+
+	if (target:is_collapsed()) return false
 
 	log("rule_const: " .. tostring(rule_const))
 	local rules_to_check = nil
@@ -92,20 +119,18 @@ function neighbor_rules:ortho(source, tiles, neighbor, rule_const)
 		log("can't find rule," .. rule_const)
 	end
 
-	log("rules to check: " .. tostring(rules_to_check))
-
 	local states_to_rm = {}
 
 	-- tn=tile_neighbor
-	for tn in all(neighbor.list_of_tiles) do
+	for tn in all(target.list_of_tiles) do
 		local change = true
 		-- ts = tile_source
-		local ts = source.tile
-		for r in all(rules_to_check) do
-			if (r[1] == ts and r[2] == tn)
-			or (r[2] == ts and r[1] == tn) then
-				log("----found match")
-				change = false
+		for ts in all(source.list_of_tiles) do
+			for r in all(rules_to_check) do
+				if (r[1] == ts and r[2] == tn)
+				or (r[2] == ts and r[1] == tn) then
+					change = false
+				end
 			end
 		end
 		if change then
@@ -113,10 +138,17 @@ function neighbor_rules:ortho(source, tiles, neighbor, rule_const)
 		end
 	end
 
-	log("bork2")
-	log(count(states_to_rm))
+	log("states_to_rm:" .. tostring(states_to_rm))
+
+	if (#states_to_rm == 0) return false
+
 	for t in all(states_to_rm) do
-		log("bork")
-		neighbor:remove(t)
+		target:remove(t)
 	end
+
+	log("neighbor now: " .. tostring(neighbor))
+
+	log("rtn true")
+
+	return true
 end

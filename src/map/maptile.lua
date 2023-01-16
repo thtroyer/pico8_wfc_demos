@@ -9,7 +9,7 @@ function maptile:new()
 
 	o.list_of_tiles = {}
 
-	o.tile = nil
+	o.tile = -1
 	o.x = nil
 	o.y = nil
 
@@ -21,7 +21,7 @@ function maptile:entropy()
 end
 
 function maptile:is_collapsed()
-	return not (self.tile == nil)
+	return not (self.tile == -1)
 end
 
 function maptile:add(tile)
@@ -29,11 +29,7 @@ function maptile:add(tile)
 end
 
 function maptile:remove(tile)
-	log("removing"..tile .." from " ..x..","..y)
 	del(self.list_of_tiles, tile)
-	for s in all(self.list_of_tiles) do
-		log("s: " ..s)
-	end
 end
 
 function maptile:collapse()
@@ -47,10 +43,11 @@ function maptile:collapse()
 	log(self.list_of_tiles)
 	log(count(self.list_of_tiles))
 	if (count(self.list_of_tiles) == 0) then
-		self.tile = 86
+		self.tile = 79
 		log ("something broke")
 		return
 	end
+
 	self.tile = rnd(self.list_of_tiles)
 
 	-- draw once collapsed

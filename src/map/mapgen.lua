@@ -39,12 +39,12 @@ function mapgen:collapse()
 	log("mapgen:collapse()")
 	local resolved = false
 	local low_tiles = self.mapdata:lowest()
-	log("low tiles")
-	log(tostring(low_tiles))
+	-- log("low tiles")
+	-- log(tostring(low_tiles))
 
 	while not (#low_tiles == 0) do
-		log("low tiles")
-		log(tostring(low_tiles))
+		-- log("low tiles")
+		-- log(tostring(low_tiles))
 
 		-- find lowest entropy
 		local low_ent_tile = rnd(low_tiles)
