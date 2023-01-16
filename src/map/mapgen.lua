@@ -10,15 +10,41 @@ function mapgen:new()
 	self.rules = {}
 
 	local r = neighbor_rules:new()
-	r:add_neighbors(102, 65, neighbor_rules_const.all)
-	r:add_neighbors(86, 102, neighbor_rules_const.all)
-	r:add_neighbors(102,103, neighbor_rules_const.all)
+
 	r:add_neighbors(86, 86, neighbor_rules_const.all)
-	r:add_neighbors(86, 87, neighbor_rules_const.all)
-	r:add_neighbors(86, 70, neighbor_rules_const.all)
-	r:add_neighbors(70, 70, neighbor_rules_const.all)
-	r:add_neighbors(70,71, neighbor_rules_const.all)
-	r:add_neighbors(71, 71, neighbor_rules_const.all)
+	r:add_neighbors(102, 102, neighbor_rules_const.all)
+
+	-- horizontal
+	r:add_neighbors(86, 80, neighbor_rules_const.right)
+	r:add_neighbors(86, 81, neighbor_rules_const.left)
+
+	r:add_neighbors(102, 80, neighbor_rules_const.right)
+	r:add_neighbors(102, 81, neighbor_rules_const.left)
+
+	-- r:add_neighbors(96, 96, neighbor_rules_const.left)
+	-- r:add_neighbors(97, 97, neighbor_rules_const.right)
+
+	-- -- vertical
+	-- r:add_neighbors(81, 86, neighbor_rules_const.right)
+	-- r:add_neighbors(80, 86, neighbor_rules_const.left)
+
+	-- r:add_neighbors(81, 102, neighbor_rules_const.left)
+	-- r:add_neighbors(80, 102, neighbor_rules_const.right)
+
+	-- r:add_neighbors(81, 81, neighbor_rules_const.above)
+	-- r:add_neighbors(80, 80, neighbor_rules_const.below)
+
+
+
+	-- r:add_neighbors(102, 65, neighbor_rules_const.all)
+	-- r:add_neighbors(86, 102, neighbor_rules_const.all)
+	-- r:add_neighbors(102,103, neighbor_rules_const.all)
+	-- r:add_neighbors(86, 86, neighbor_rules_const.all)
+	-- r:add_neighbors(86, 87, neighbor_rules_const.all)
+	-- r:add_neighbors(86, 70, neighbor_rules_const.all)
+	-- r:add_neighbors(70, 70, neighbor_rules_const.all)
+	-- r:add_neighbors(70,71, neighbor_rules_const.all)
+	-- r:add_neighbors(71, 71, neighbor_rules_const.all)
 	add(self.rules, r)
 	o.map_tiles = {}
 
