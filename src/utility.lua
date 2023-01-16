@@ -45,6 +45,10 @@ function log(msg)
 	printh(msg, "log.txt", false)
 end
 
+function clearlog()
+	printh("", "log.txt", true)
+end
+
 function debug(msg)
 	print(msg, 20, 20, 7)
 end

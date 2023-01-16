@@ -1,6 +1,8 @@
 
 -- pico-8 hooks
 function _init()
+	clearlog()
+
 	--	title_screen = true
 	--	draw_title_screen()
 	add(players, player:new(10, rnd(20) + 20, 1))

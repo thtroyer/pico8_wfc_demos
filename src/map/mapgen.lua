@@ -1,8 +1,7 @@
 
 -- mapgen
 mapgen = {}
---todo: cleanup below
--- keep migrating to use mapobj
+
 function mapgen:new()
 	local o = {}
 	setmetatable(o, self)
@@ -11,15 +10,15 @@ function mapgen:new()
 	self.rules = {}
 
 	local r = neighbor_rules:new()
-	r:add_neighbors(102, 65)
-	r:add_neighbors(86, 102)
-	r:add_neighbors(102,103)
-	r:add_neighbors(86, 86)
-	r:add_neighbors(86, 87)
-	r:add_neighbors(86, 70)
-	r:add_neighbors(70, 70)
-	r:add_neighbors(70,71)
-	r:add_neighbors(71, 71)
+	r:add_neighbors(102, 65, neighbor_rules_const.all)
+	r:add_neighbors(86, 102, neighbor_rules_const.all)
+	r:add_neighbors(102,103, neighbor_rules_const.all)
+	r:add_neighbors(86, 86, neighbor_rules_const.all)
+	r:add_neighbors(86, 87, neighbor_rules_const.all)
+	r:add_neighbors(86, 70, neighbor_rules_const.all)
+	r:add_neighbors(70, 70, neighbor_rules_const.all)
+	r:add_neighbors(70,71, neighbor_rules_const.all)
+	r:add_neighbors(71, 71, neighbor_rules_const.all)
 	add(self.rules, r)
 	o.map_tiles = {}
 
@@ -28,7 +27,6 @@ function mapgen:new()
 end
 
 function mapgen:generate()
-	log("mapgen:generate()")
 	self:initialize()
 	self:collapse()
 end

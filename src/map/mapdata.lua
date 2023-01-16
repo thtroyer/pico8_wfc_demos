@@ -20,9 +20,9 @@ function mapdata:initialize()
 	log("generating map tiles")
 	for y = 0, 15 do
 		for x = 0, 15 do
-			log(x..","..y)
-			log(x+y*16)
-			log("adding " .. x+y*16)
+			-- log(x..","..y)
+			-- log(x+y*16)
+			-- log("adding " .. x+y*16)
 			map_tiles[x+y*16] = maptile:new(64, 65)
 			map_tiles[x+y*16].x = x
 			map_tiles[x+y*16].y = y
@@ -33,7 +33,7 @@ function mapdata:initialize()
 			map_tiles[x+y*16]:add(70)
 			map_tiles[x+y*16]:add(71)
 		end
-		log(tostring(map_tiles))
+		-- log(tostring(map_tiles))
 	end
 	self.map_tiles = map_tiles
 end
