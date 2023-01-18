@@ -38,10 +38,10 @@ function maptile:collapse()
 		return
 	end
 
-	log("collapsing")
-	log("tiles:")
-	log(self.list_of_tiles)
-	log(count(self.list_of_tiles))
+	log("")
+	log("maptile:collapsing ")
+
+	log("count of self.list_of_tiles " .. count(self.list_of_tiles))
 	if (count(self.list_of_tiles) == 0) then
 		self.tile = 79
 		log ("something broke")

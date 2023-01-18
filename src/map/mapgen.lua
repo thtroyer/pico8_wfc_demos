@@ -14,12 +14,95 @@ function mapgen:new()
 	r:add_neighbors(86, 86, neighbor_rules_const.all)
 	r:add_neighbors(102, 102, neighbor_rules_const.all)
 
-	-- horizontal
-	r:add_neighbors(86, 80, neighbor_rules_const.right)
-	r:add_neighbors(86, 81, neighbor_rules_const.left)
+	r:add_neighbors(79, 80, neighbor_rules_const.all)
+	r:add_neighbors(79, 81, neighbor_rules_const.all)
+	r:add_neighbors(79, 82, neighbor_rules_const.all)
+	r:add_neighbors(79, 83, neighbor_rules_const.all)
+	r:add_neighbors(79, 84, neighbor_rules_const.all)
+	r:add_neighbors(79, 85, neighbor_rules_const.all)
+	r:add_neighbors(79, 86, neighbor_rules_const.all)
+	r:add_neighbors(79, 96, neighbor_rules_const.all)
+	r:add_neighbors(79, 97, neighbor_rules_const.all)
+	r:add_neighbors(79, 98, neighbor_rules_const.all)
+	r:add_neighbors(79, 99, neighbor_rules_const.all)
+	r:add_neighbors(79, 100, neighbor_rules_const.all)
+	r:add_neighbors(79, 101, neighbor_rules_const.all)
+	r:add_neighbors(79, 102, neighbor_rules_const.all)
+	r:add_neighbors(79, 79, neighbor_rules_const.all)
 
-	r:add_neighbors(102, 80, neighbor_rules_const.right)
-	r:add_neighbors(102, 81, neighbor_rules_const.left)
+	-- horizontal
+	-- r:add_neighbors(80, 86, neighbor_rules_const.right)
+	r:add_neighbors(81, 86, neighbor_rules_const.left)
+
+	r:add_neighbors(80, 102, neighbor_rules_const.right)
+	-- r:add_neighbors(81, 102, neighbor_rules_const.left)
+
+	r:add_neighbors(96, 96, neighbor_rules_const.right)
+	r:add_neighbors(96, 96, neighbor_rules_const.left)
+
+	r:add_neighbors(97, 97, neighbor_rules_const.right)
+	r:add_neighbors(97, 97, neighbor_rules_const.left)
+
+
+	-- vertical
+	r:add_neighbors(80, 80, neighbor_rules_const.above)
+	r:add_neighbors(80, 80, neighbor_rules_const.below)
+
+	r:add_neighbors(81, 81, neighbor_rules_const.above)
+	r:add_neighbors(81, 81, neighbor_rules_const.below)
+
+	r:add_neighbors(96, 102, neighbor_rules_const.below)
+	r:add_neighbors(97, 102, neighbor_rules_const.above)
+
+	r:add_neighbors(96, 86, neighbor_rules_const.above)
+	r:add_neighbors(97, 86, neighbor_rules_const.below)
+
+	-- corners
+	--todo: finish, add corners and edges to list
+	r:add_neighbors(82, 80, neighbor_rules_const.above)
+	r:add_neighbors(82, 97, neighbor_rules_const.left)
+	r:add_neighbors(82, 86, neighbor_rules_const.below)
+	r:add_neighbors(82, 86, neighbor_rules_const.right)
+
+	r:add_neighbors(83, 81, neighbor_rules_const.above)
+	r:add_neighbors(83, 86, neighbor_rules_const.left)
+	r:add_neighbors(83, 86, neighbor_rules_const.below)
+	r:add_neighbors(83, 97, neighbor_rules_const.right)
+
+	r:add_neighbors(98, 86, neighbor_rules_const.above)
+	r:add_neighbors(98, 96, neighbor_rules_const.left)
+	r:add_neighbors(98, 80, neighbor_rules_const.below)
+	r:add_neighbors(98, 86, neighbor_rules_const.right)
+
+	r:add_neighbors(99, 86, neighbor_rules_const.above)
+	r:add_neighbors(99, 86, neighbor_rules_const.left)
+	r:add_neighbors(99, 81, neighbor_rules_const.below)
+	r:add_neighbors(99, 96, neighbor_rules_const.right)
+
+	
+	r:add_neighbors(84, 81, neighbor_rules_const.above)
+	r:add_neighbors(84, 96, neighbor_rules_const.left)
+	r:add_neighbors(84, 102, neighbor_rules_const.below)
+	r:add_neighbors(84, 102, neighbor_rules_const.right)
+
+	r:add_neighbors(85, 81, neighbor_rules_const.above)
+	r:add_neighbors(85, 102, neighbor_rules_const.left)
+	r:add_neighbors(85, 102, neighbor_rules_const.below)
+	r:add_neighbors(85, 96, neighbor_rules_const.right)
+
+	r:add_neighbors(100, 102, neighbor_rules_const.above)
+	r:add_neighbors(100, 97, neighbor_rules_const.left)
+	r:add_neighbors(100, 81, neighbor_rules_const.below)
+	r:add_neighbors(100, 102, neighbor_rules_const.right)
+
+	r:add_neighbors(101, 102, neighbor_rules_const.above)
+	r:add_neighbors(101, 102, neighbor_rules_const.left)
+	r:add_neighbors(101, 80, neighbor_rules_const.below)
+	r:add_neighbors(101, 97, neighbor_rules_const.right)
+
+
+	
+
 
 	-- r:add_neighbors(96, 96, neighbor_rules_const.left)
 	-- r:add_neighbors(97, 97, neighbor_rules_const.right)
@@ -74,6 +157,10 @@ function mapgen:collapse()
 
 		-- find lowest entropy
 		local low_ent_tile = rnd(low_tiles)
+		if (#low_tiles == 255) then
+			low_ent_tile = low_tiles[17] -- 1,1
+		end
+
 		log("collapsing tile " .. low_ent_tile.x .. ", " .. low_ent_tile.y)
 		low_ent_tile:collapse()
 
@@ -112,11 +199,11 @@ function mapgen:propogate(affected_tile)
 	x = affected_tile.x
 	y = affected_tile.y
 
+	log("")
 	log("collapsed " .. x .. ", " .. y)
-	log("propogating...")
-	log("tiles:")
+	log("mapgen:propogate")
+
 	local tiles = self.mapdata.map_tiles
-	log(tiles)
 	for rule in all(self.rules) do
 		rule:propogate(affected_tile, self.mapdata)
 	end

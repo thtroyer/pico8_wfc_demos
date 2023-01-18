@@ -28,20 +28,34 @@ function neighbor_rules:add_neighbors(tile1, tile2, direction)
 	local neighbors = {}
 	add(neighbors, tile1)
 	add(neighbors, tile2)
+	local neighbors2 = {}
+	add(neighbors2, tile2)
+	add(neighbors2, tile1)
+
+
+	log("adding neighbors " .. tostring(neighbors) .. " to " .. direction)
 
 	if (direction == neighbor_rules_const.above) then
 		add(self.list_of_neighbors_above, neighbors)
+		add(self.list_of_neighbors_below, neighbors2)
 	elseif (direction == neighbor_rules_const.below) then
 		add(self.list_of_neighbors_below, neighbors)
+		add(self.list_of_neighbors_above, neighbors2)
 	elseif (direction == neighbor_rules_const.right) then
 		add(self.list_of_neighbors_right, neighbors)
+		add(self.list_of_neighbors_left, neighbors2)
 	elseif (direction == neighbor_rules_const.left) then
 		add(self.list_of_neighbors_left, neighbors)
+		add(self.list_of_neighbors_right, neighbors2)
 	elseif (direction == neighbor_rules_const.all) then
 		add(self.list_of_neighbors_above, neighbors)
 		add(self.list_of_neighbors_below, neighbors)
 		add(self.list_of_neighbors_right, neighbors)
 		add(self.list_of_neighbors_left, neighbors)
+		add(self.list_of_neighbors_above, neighbors2)
+		add(self.list_of_neighbors_below, neighbors2)
+		add(self.list_of_neighbors_right, neighbors2)
+		add(self.list_of_neighbors_left, neighbors2)
 	end
 end
 
@@ -76,7 +90,7 @@ function neighbor_rules:propogate(source, mapdata)
 		end
 	end
 
-	if not (y <= 15) then
+	if not (y <= 0) then
 		if(self:ortho(source, tiles, tiles[x+(y-1)*16], neighbor_rules_const.below)) then
 			-- self:propogate(tiles[x+(y-1)*16], mapdata)
 		end
@@ -119,6 +133,8 @@ function neighbor_rules:ortho(source, tiles, target, rule_const)
 		log("can't find rule," .. rule_const)
 	end
 
+	log(" rules to compare: " .. tostring(rules_to_check))
+
 	local states_to_rm = {}
 
 	-- tn=tile_neighbor
@@ -127,8 +143,8 @@ function neighbor_rules:ortho(source, tiles, target, rule_const)
 		-- ts = tile_source
 		for ts in all(source.list_of_tiles) do
 			for r in all(rules_to_check) do
-				if (r[1] == ts and r[2] == tn)
-				or (r[2] == ts and r[1] == tn) then
+				if (r[1] == ts and r[2] == tn) then
+				-- or (r[2] == ts and r[1] == tn) then
 					change = false
 				end
 			end
@@ -146,7 +162,7 @@ function neighbor_rules:ortho(source, tiles, target, rule_const)
 		target:remove(t)
 	end
 
-	log("neighbor now: " .. tostring(neighbor))
+	log("neighbor now: " .. tostring(target))
 
 	log("rtn true")
 

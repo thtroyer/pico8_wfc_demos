@@ -26,12 +26,27 @@ function mapdata:initialize()
 			map_tiles[x+y*16] = maptile:new()
 			map_tiles[x+y*16].x = x
 			map_tiles[x+y*16].y = y
-			map_tiles[x+y*16]:add(86)
-			map_tiles[x+y*16]:add(102)
-			map_tiles[x+y*16]:add(81)
+			-- map_tiles[x+y*16]:add(86)
+			-- map_tiles[x+y*16]:add(102)
+			-- map_tiles[x+y*16]:add(81)
+			-- map_tiles[x+y*16]:add(80)
+			-- map_tiles[x+y*16]:add(96)
+			-- map_tiles[x+y*16]:add(97)
 			map_tiles[x+y*16]:add(80)
+			map_tiles[x+y*16]:add(81)
+			map_tiles[x+y*16]:add(82)
+			map_tiles[x+y*16]:add(83)
+			map_tiles[x+y*16]:add(84)
+			map_tiles[x+y*16]:add(85)
+			map_tiles[x+y*16]:add(86)
+
 			map_tiles[x+y*16]:add(96)
 			map_tiles[x+y*16]:add(97)
+			map_tiles[x+y*16]:add(98)
+			map_tiles[x+y*16]:add(99)
+			map_tiles[x+y*16]:add(100)
+			map_tiles[x+y*16]:add(101)
+			map_tiles[x+y*16]:add(102)
 		end
 		-- log(tostring(map_tiles))
 	end
@@ -69,7 +84,7 @@ function mapdata:lowest()
 	local l_list = {}
 
 	for t in all(self.map_tiles) do
-		if not t:is_collapsed() then
+		if not t:is_collapsed() and #t.list_of_tiles ~= 0 then
 			local ent = t:entropy()
 			if ent == lowest_entropy then
 				add(l_list, t)
