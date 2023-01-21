@@ -1,19 +1,8 @@
 pico-8 cartridge // http://www.pico-8.com
 version 39
 __lua__
---wave function collapse demo
+--wave function collapse demo 2
 --experimenting with simplified version
-
--- global lists
-players = {}
-snowballs = {}
-snowmen = {}
-
--- global timers
-title_screen_timer = nil
-
--- global state
-title_screen = false
 
 -- utility methods
 #include src/utility.lua

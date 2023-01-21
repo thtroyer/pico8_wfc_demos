@@ -89,15 +89,10 @@ end
 -- mapdata:mapdata
 -- returns void
 function neighbor_rules:propogate(source, mapdata)
-	-- log("rules above " .. tostring(self.list_of_neighbors_above))
-	-- log("rules below " .. tostring(self.list_of_neighbors_below))
-	-- log("rules right " .. tostring(self.list_of_neighbors_right))
-	-- log("rules left " .. tostring(self.list_of_neighbors_left))
 	local x = source.x
 	local y = source.y
 	local tiles = mapdata.map_tiles
 
-	-- todo: propogating recursively isn't working quite right yet
 	if not (x >= 15) then
 		if (self:update(source, tiles, tiles[(x+1)+y*16], neighbor_rules.left)) then
 			self:propogate(tiles[(x+1)+y*16], mapdata)
@@ -132,7 +127,6 @@ end
 -- rules_const : int -- which rules to check
 -- return boolean -- whether neighbor was updated
 function neighbor_rules:update(source, tiles, target, rule_const)
-	-- log("propogating changes to "..x..","..y)
 	if (target == nil) then
 		log("target not found")
 		return
@@ -170,9 +164,6 @@ function neighbor_rules:update(source, tiles, target, rule_const)
 		for ts in all(source.list_of_tiles) do
 			for r in all(rules_to_check) do
 				if (r[1] == ts and r[2] == tn) then
-				-- or (r[2] == ts and r[1] == tn) then
-				-- if (r[1] == ts and r[2] == tn) 
-				-- or (r[2] == ts and r[1] == tn) then
 					change = false
 				end
 			end
