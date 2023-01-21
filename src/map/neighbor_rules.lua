@@ -13,6 +13,11 @@ function neighbor_rules:new()
 	setmetatable(o, self)
 	self.__index = self
 
+	-- 0 is fastest, but may generate conflicts
+	-- negative number allows infinite.  slow, but doesn't appear to create conflicts
+	-- 1 is safer than 0, but potentially still slow
+	o.times_to_recurse = 0
+
 	o.list_of_neighbors_above = {}
 	o.list_of_neighbors_below = {}
 	o.list_of_neighbors_right = {}
@@ -31,9 +36,6 @@ function neighbor_rules:add_neighbors(tile1, direction, tile2)
 	local swapped_neighbors = {}
 	add(swapped_neighbors, tile2)
 	add(swapped_neighbors, tile1)
-
-
-	log("adding neighbors " .. tostring(neighbors) .. " to " .. direction)
 
 	if (direction == neighbor_rules.above) then
 		add(self.list_of_neighbors_above, neighbors)
@@ -88,32 +90,37 @@ end
 -- source : map_tile
 -- mapdata:mapdata
 -- returns void
-function neighbor_rules:propogate(source, mapdata)
+function neighbor_rules:propogate(source, mapdata, c)
 	local x = source.x
 	local y = source.y
 	local tiles = mapdata.map_tiles
 
+	if (c == 0) return
+
+	if (c == nil) c = self.times_to_recurse+1
+	
+
 	if not (x >= 15) then
 		if (self:update(source, tiles, tiles[(x+1)+y*16], neighbor_rules.left)) then
-			self:propogate(tiles[(x+1)+y*16], mapdata)
+			self:propogate(tiles[(x+1)+y*16], mapdata, c-1)
 		end
 	end
 	
 	if not (x <= 0) then
 		if(self:update(source, tiles, tiles[(x-1)+y*16], neighbor_rules.right)) then
-			self:propogate(tiles[(x-1)+y*16], mapdata)
+			self:propogate(tiles[(x-1)+y*16], mapdata, c-1)
 		end
 	end
 
 	if not (y >= 15) then
 		if (self:update(source, tiles, tiles[x+(y+1)*16], neighbor_rules.above)) then
-			self:propogate(tiles[x+(y+1)*16], mapdata)
+			self:propogate(tiles[x+(y+1)*16], mapdata, c-1)
 		end
 	end
 
 	if not (y <= 0) then
 		if(self:update(source, tiles, tiles[x+(y-1)*16], neighbor_rules.below)) then
-			self:propogate(tiles[x+(y-1)*16], mapdata)
+			self:propogate(tiles[x+(y-1)*16], mapdata, c-1)
 		end
 	end
 
@@ -128,17 +135,11 @@ end
 -- return boolean -- whether neighbor was updated
 function neighbor_rules:update(source, tiles, target, rule_const)
 	if (target == nil) then
-		log("target not found")
 		return
 	end
 
-	log("propogating changes to "..target.x..","..target.y)
-
-	log(tostring(target))
-
 	if (target:is_collapsed()) return false
 
-	log("rule_const: " .. tostring(rule_const))
 	local rules_to_check = nil
 
 	if (rule_const == neighbor_rules.above) then
@@ -152,8 +153,6 @@ function neighbor_rules:update(source, tiles, target, rule_const)
 	else
 		log("can't find rule," .. rule_const)
 	end
-
-	log(" rules to compare: " .. tostring(rules_to_check))
 
 	local states_to_rm = {}
 
@@ -173,17 +172,11 @@ function neighbor_rules:update(source, tiles, target, rule_const)
 		end
 	end
 
-	log("states_to_rm:" .. tostring(states_to_rm))
-
 	if (#states_to_rm == 0) return false
 
 	for t in all(states_to_rm) do
 		target:remove(t)
 	end
-
-	log("neighbor now: " .. tostring(target))
-
-	log("rtn true")
 
 	return true
 end

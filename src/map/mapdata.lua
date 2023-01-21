@@ -9,7 +9,6 @@ function mapdata:new()
 
 	-- list<map_tiles>
 	o.map_tiles = {}
-	log("mapdata:new()")
 	return o
 end
 
@@ -17,7 +16,6 @@ end
 function mapdata:initialize()
 	local map_tiles = {}
 
-	log("generating map tiles")
 	for y = 0, 15 do
 		for x = 0, 15 do
 			map_tiles[x+y*16] = maptile:new()
@@ -99,6 +97,5 @@ function mapdata:lowest()
 		end
 	end
 
-	log("found " .. count(l_list))
 	return l_list
 end

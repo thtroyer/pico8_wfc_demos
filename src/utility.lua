@@ -1,7 +1,6 @@
 
 -- utility methods
 function tostring(var) 
-	if (true) then return "" end
 	if var == nil then
 		return "nil"
 	end
@@ -43,7 +42,7 @@ function random_int(low, high)
 end
 
 function log(msg)
-	-- printh(msg, "log.txt", false)
+	printh(msg, "log.txt", false)
 end
 
 function clearlog()

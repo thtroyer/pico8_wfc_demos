@@ -102,18 +102,13 @@ function mapgen:initialize()
 end
 
 function mapgen:collapse()
-	log("mapgen:collapse()")
 	local resolved = false
 	local low_tiles = self.mapdata:lowest()
 
 	while not (#low_tiles == 0) do
 		-- find lowest entropy
 		local low_ent_tile = rnd(low_tiles)
-		if (#low_tiles == 255) then
-			low_ent_tile = low_tiles[17] -- 1,1
-		end
 
-		log("collapsing tile " .. low_ent_tile.x .. ", " .. low_ent_tile.y)
 		low_ent_tile:collapse()
 
 		-- propogate tile changes
@@ -136,22 +131,16 @@ end
 function mapgen:print_all_states(tiles)
     local tiles = self.mapdata.map_tiles
 	for t in all(tiles) do
-		log(t.x..","..t.y)
 		local states = ""
 		for s in all(t.list_of_tiles) do
 			states = states .. s .. ", "
 		end
-		log(states)
 	end
 end
 
 function mapgen:propogate(affected_tile)
 	x = affected_tile.x
 	y = affected_tile.y
-
-	log("")
-	log("collapsed " .. x .. ", " .. y)
-	log("mapgen:propogate")
 
 	local tiles = self.mapdata.map_tiles
 	for rule in all(self.rules) do
