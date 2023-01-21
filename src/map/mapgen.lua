@@ -58,6 +58,9 @@ function mapgen:new()
 
 	-- r:add_neighbors(115, neighbor_rules.all, 115)
 
+	local count_rule = count_rules:new()
+	add(o.rules, count_rule)
+
 	o.map_tiles = {}
 
 	o.mapdata = mapdata:new()
