@@ -111,8 +111,8 @@ function mapgen:collapse()
 
 		low_ent_tile:collapse()
 
-		-- propogate tile changes
-		self:propogate(low_ent_tile)
+		-- propagate tile changes
+		self:propagate(low_ent_tile)
 
 		low_tiles = self.mapdata:lowest()
 	end
@@ -138,12 +138,12 @@ function mapgen:print_all_states(tiles)
 	end
 end
 
-function mapgen:propogate(affected_tile)
+function mapgen:propagate(affected_tile)
 	x = affected_tile.x
 	y = affected_tile.y
 
 	local tiles = self.mapdata.map_tiles
 	for rule in all(self.rules) do
-		rule:propogate(affected_tile, self.mapdata)
+		rule:propagate(affected_tile, self.mapdata)
 	end
 end

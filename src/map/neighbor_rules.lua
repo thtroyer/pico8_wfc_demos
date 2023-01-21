@@ -90,7 +90,7 @@ end
 -- source : map_tile
 -- mapdata:mapdata
 -- returns void
-function neighbor_rules:propogate(source, mapdata, c)
+function neighbor_rules:propagate(source, mapdata, c)
 	local x = source.x
 	local y = source.y
 	local tiles = mapdata.map_tiles
@@ -102,25 +102,25 @@ function neighbor_rules:propogate(source, mapdata, c)
 
 	if not (x >= 15) then
 		if (self:update(source, tiles, tiles[(x+1)+y*16], neighbor_rules.left)) then
-			self:propogate(tiles[(x+1)+y*16], mapdata, c-1)
+			self:propagate(tiles[(x+1)+y*16], mapdata, c-1)
 		end
 	end
 	
 	if not (x <= 0) then
 		if(self:update(source, tiles, tiles[(x-1)+y*16], neighbor_rules.right)) then
-			self:propogate(tiles[(x-1)+y*16], mapdata, c-1)
+			self:propagate(tiles[(x-1)+y*16], mapdata, c-1)
 		end
 	end
 
 	if not (y >= 15) then
 		if (self:update(source, tiles, tiles[x+(y+1)*16], neighbor_rules.above)) then
-			self:propogate(tiles[x+(y+1)*16], mapdata, c-1)
+			self:propagate(tiles[x+(y+1)*16], mapdata, c-1)
 		end
 	end
 
 	if not (y <= 0) then
 		if(self:update(source, tiles, tiles[x+(y-1)*16], neighbor_rules.below)) then
-			self:propogate(tiles[x+(y-1)*16], mapdata, c-1)
+			self:propagate(tiles[x+(y-1)*16], mapdata, c-1)
 		end
 	end
 
