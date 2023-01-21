@@ -52,3 +52,21 @@ end
 function debug(msg)
 	print(msg, 20, 20, 7)
 end
+
+function littleslow()
+	for i=1,9999,1 do
+		debug("")
+	end
+end
+
+function slow()
+	for i=1,999999,1 do
+		debug("")
+	end
+end
+
+function reallyslow()
+	for i=1,9999999,1 do
+		debug("")
+	end
+end

@@ -1,6 +1,6 @@
 
-neighbor_rules = {}
-neighbor_rules_const = {
+neighbor_rules = {
+	-- consts
 	above = 0,
 	below = 1,
 	right = 2,
@@ -23,39 +23,35 @@ end
 
 -- tile1 : int -- refers to sprite #
 -- tile2 : int -- refers to sprite #
--- direction : int -- refers to a neighbor_rules_const value
-function neighbor_rules:add_neighbors(tile1, tile2, direction)
+-- direction : int -- refers to a neighbor_rules const 
+function neighbor_rules:add_neighbors(tile1, direction, tile2)
 	local neighbors = {}
 	add(neighbors, tile1)
 	add(neighbors, tile2)
-	local neighbors2 = {}
-	add(neighbors2, tile2)
-	add(neighbors2, tile1)
+	local swapped_neighbors = {}
+	add(swapped_neighbors, tile2)
+	add(swapped_neighbors, tile1)
 
 
 	log("adding neighbors " .. tostring(neighbors) .. " to " .. direction)
 
-	if (direction == neighbor_rules_const.above) then
+	if (direction == neighbor_rules.above) then
 		add(self.list_of_neighbors_above, neighbors)
-		add(self.list_of_neighbors_below, neighbors2)
-	elseif (direction == neighbor_rules_const.below) then
+		add(self.list_of_neighbors_below, swapped_neighbors)
+	elseif (direction == neighbor_rules.below) then
 		add(self.list_of_neighbors_below, neighbors)
-		add(self.list_of_neighbors_above, neighbors2)
-	elseif (direction == neighbor_rules_const.right) then
+		add(self.list_of_neighbors_above, swapped_neighbors)
+	elseif (direction == neighbor_rules.right) then
 		add(self.list_of_neighbors_right, neighbors)
-		add(self.list_of_neighbors_left, neighbors2)
-	elseif (direction == neighbor_rules_const.left) then
+		add(self.list_of_neighbors_left, swapped_neighbors)
+	elseif (direction == neighbor_rules.left) then
 		add(self.list_of_neighbors_left, neighbors)
-		add(self.list_of_neighbors_right, neighbors2)
-	elseif (direction == neighbor_rules_const.all) then
+		add(self.list_of_neighbors_right, swapped_neighbors)
+	elseif (direction == neighbor_rules.all) then
 		add(self.list_of_neighbors_above, neighbors)
 		add(self.list_of_neighbors_below, neighbors)
 		add(self.list_of_neighbors_right, neighbors)
 		add(self.list_of_neighbors_left, neighbors)
-		add(self.list_of_neighbors_above, neighbors2)
-		add(self.list_of_neighbors_below, neighbors2)
-		add(self.list_of_neighbors_right, neighbors2)
-		add(self.list_of_neighbors_left, neighbors2)
 	end
 end
 
@@ -73,26 +69,26 @@ function neighbor_rules:propogate(source, mapdata)
 
 	-- todo: propogating recursively isn't working quite right yet
 	if not (x >= 15) then
-		if (self:ortho(source, tiles, tiles[(x+1)+y*16], neighbor_rules_const.right)) then
-			-- self:propogate(tiles[(x+1)+y*16], mapdata)
+		if (self:update(source, tiles, tiles[(x+1)+y*16], neighbor_rules.left)) then
+			self:propogate(tiles[(x+1)+y*16], mapdata)
 		end
 	end
 	
 	if not (x <= 0) then
-		if(self:ortho(source, tiles, tiles[(x-1)+y*16], neighbor_rules_const.left)) then
-			-- self:propogate(tiles[(x-1)+y*16], mapdata)
+		if(self:update(source, tiles, tiles[(x-1)+y*16], neighbor_rules.right)) then
+			self:propogate(tiles[(x-1)+y*16], mapdata)
 		end
 	end
 
 	if not (y >= 15) then
-		if (self:ortho(source, tiles, tiles[x+(y+1)*16], neighbor_rules_const.above)) then
-			-- self:propogate(tiles[x+(y+1)*16], mapdata)
+		if (self:update(source, tiles, tiles[x+(y+1)*16], neighbor_rules.below)) then
+			self:propogate(tiles[x+(y+1)*16], mapdata)
 		end
 	end
 
 	if not (y <= 0) then
-		if(self:ortho(source, tiles, tiles[x+(y-1)*16], neighbor_rules_const.below)) then
-			-- self:propogate(tiles[x+(y-1)*16], mapdata)
+		if(self:update(source, tiles, tiles[x+(y-1)*16], neighbor_rules.above)) then
+			self:propogate(tiles[x+(y-1)*16], mapdata)
 		end
 	end
 
@@ -105,7 +101,7 @@ end
 -- neighbor : map_tile
 -- rules_const : int -- which rules to check
 -- return boolean -- whether neighbor was updated
-function neighbor_rules:ortho(source, tiles, target, rule_const)
+function neighbor_rules:update(source, tiles, target, rule_const)
 	-- log("propogating changes to "..x..","..y)
 	if (target == nil) then
 		log("target not found")
@@ -121,13 +117,13 @@ function neighbor_rules:ortho(source, tiles, target, rule_const)
 	log("rule_const: " .. tostring(rule_const))
 	local rules_to_check = nil
 
-	if (rule_const == neighbor_rules_const.above) then
+	if (rule_const == neighbor_rules.above) then
 		rules_to_check = self.list_of_neighbors_above
-	elseif (rule_const == neighbor_rules_const.below) then
+	elseif (rule_const == neighbor_rules.below) then
 		rules_to_check = self.list_of_neighbors_below
-	elseif (rule_const == neighbor_rules_const.right) then
+	elseif (rule_const == neighbor_rules.right) then
 		rules_to_check = self.list_of_neighbors_right
-	elseif (rule_const == neighbor_rules_const.left) then
+	elseif (rule_const == neighbor_rules.left) then
 		rules_to_check = self.list_of_neighbors_left
 	else
 		log("can't find rule," .. rule_const)
@@ -144,6 +140,8 @@ function neighbor_rules:ortho(source, tiles, target, rule_const)
 		for ts in all(source.list_of_tiles) do
 			for r in all(rules_to_check) do
 				if (r[1] == ts and r[2] == tn) then
+				-- or (r[2] == ts and r[1] == tn) then
+				-- if (r[1] == ts and r[2] == tn) 
 				-- or (r[2] == ts and r[1] == tn) then
 					change = false
 				end
