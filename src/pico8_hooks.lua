@@ -15,4 +15,6 @@ end
 function _draw()
 	cls()
 	map()
+	-- getSpritePixels(0)
+	-- getSpritePixels(80)
 end
