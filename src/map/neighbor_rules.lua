@@ -55,6 +55,38 @@ function neighbor_rules:add_neighbors(tile1, direction, tile2)
 	end
 end
 
+-- public
+-- updates list_of_neighbors_*
+-- returns void
+function neighbor_rules:deduplicate_rules()
+	self:deduplicate_rule(self.list_of_neighbors_above)
+	self:deduplicate_rule(self.list_of_neighbors_below)
+	self:deduplicate_rule(self.list_of_neighbors_left)
+	self:deduplicate_rule(self.list_of_neighbors_right)
+end
+
+-- private
+-- updates passed &rules
+-- ensures there arne't any duplicate rules to cycle through
+--
+-- returns void
+function neighbor_rules:deduplicate_rule(rules)
+	log("rules" .. tostring(rules))
+	local newrules = {}
+	local foundrules = {}
+	for k,v in pairs(rules) do
+		local hashval = tostring(v)
+		if (not foundrules[hashval]) then
+			foundrules[hashval] = true
+			add(newrules, v)
+		end
+	end
+
+	rules = newrules
+	log("newrules" .. tostring(rules))
+	-- return newrules
+end
+
 -- source : map_tile
 -- mapdata:mapdata
 -- returns void

@@ -42,6 +42,8 @@ function mapgen:new()
 	r:add_neighbors(115, neighbor_rules.below, 113)
 	r:add_neighbors(115, neighbor_rules.below, 114)
 
+	r:deduplicate_rules()
+
 
 	-- r:add_neighbors(86, 86, neighbor_rules_const.all)
 	-- r:add_neighbors(102, 102, neighbor_rules_const.all)
