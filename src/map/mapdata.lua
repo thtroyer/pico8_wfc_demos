@@ -53,6 +53,9 @@ function mapdata:initialize()
 			map_tiles[x+y*16]:add(113)
 			map_tiles[x+y*16]:add(114)
 			map_tiles[x+y*16]:add(115)
+			map_tiles[x+y*16]:add(116)
+			map_tiles[x+y*16]:add(117)
+			map_tiles[x+y*16]:add(118)
 		end
 		-- log(tostring(map_tiles))
 	end

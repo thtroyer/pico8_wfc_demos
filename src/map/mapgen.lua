@@ -11,27 +11,33 @@ function mapgen:new()
 
 	local r = neighbor_rules:new()
 
+	-- gray numbers, left to right
 	-- 112 - 1; 113 - 2; 114 - 3;
+	-- red numbers, up to down
+	-- 116, 117, 118
 	-- 115 - everything else
 	
-	-- r:add_neighbors(112, neighbor_rules.left, 113)
-	-- r:add_neighbors(113, neighbor_rules.left, 114)
-	-- r:add_neighbors(115, neighbor_rules.left, 112)
-	-- r:add_neighbors(114, neighbor_rules.left, 115)
+	-- gray numbers
+	r:add_neighbors(112, neighbor_rules.left, 113)
+	r:add_neighbors(113, neighbor_rules.left, 114)
+	r:add_neighbors(115, neighbor_rules.left, 112)
+	r:add_neighbors(114, neighbor_rules.left, 115)
 
-	-- these rules should generate the same as the above version
-	r:add_neighbors(113, neighbor_rules.right, 112)
-	r:add_neighbors(114, neighbor_rules.right, 113)
-	r:add_neighbors(112, neighbor_rules.right, 115)
-	r:add_neighbors(115, neighbor_rules.right, 114)
-	-- end 
-
-	r:add_neighbors(115, neighbor_rules.left, 115)
-
+	-- vertical gray numbers
 	r:add_neighbors(112, neighbor_rules.above, 112)
 	r:add_neighbors(113, neighbor_rules.above, 113)
 	r:add_neighbors(114, neighbor_rules.above, 114)
-	r:add_neighbors(115, neighbor_rules.above, 115)
+
+	-- red numbers
+	r:add_neighbors(115, neighbor_rules.above, 116)
+	r:add_neighbors(116, neighbor_rules.above, 117)
+	r:add_neighbors(117, neighbor_rules.above, 118)
+	r:add_neighbors(118, neighbor_rules.above, 115)
+
+	-- horizontal red numbers
+	r:add_neighbors(116, neighbor_rules.right, 116)
+	r:add_neighbors(117, neighbor_rules.right, 117)
+	r:add_neighbors(118, neighbor_rules.right, 118)
 
 	-- dot filler
 	r:add_neighbors(115, neighbor_rules.above, 112)
@@ -42,126 +48,18 @@ function mapgen:new()
 	r:add_neighbors(115, neighbor_rules.below, 113)
 	r:add_neighbors(115, neighbor_rules.below, 114)
 
+	r:add_neighbors(115, neighbor_rules.left, 116)
+	r:add_neighbors(115, neighbor_rules.left, 117)
+	r:add_neighbors(115, neighbor_rules.left, 118)
+
+	r:add_neighbors(115, neighbor_rules.right, 116)
+	r:add_neighbors(115, neighbor_rules.right, 117)
+	r:add_neighbors(115, neighbor_rules.right, 118)
+
+	r:add_neighbors(115, neighbor_rules.all, 115)
+
 	r:deduplicate_rules()
 
-
-	-- r:add_neighbors(86, 86, neighbor_rules_const.all)
-	-- r:add_neighbors(102, 102, neighbor_rules_const.all)
-
-	-- r:add_neighbors(79, 80, neighbor_rules_const.all)
-	-- r:add_neighbors(79, 81, neighbor_rules_const.all)
-	-- r:add_neighbors(79, 82, neighbor_rules_const.all)
-	-- r:add_neighbors(79, 83, neighbor_rules_const.all)
-	-- r:add_neighbors(79, 84, neighbor_rules_const.all)
-	-- r:add_neighbors(79, 85, neighbor_rules_const.all)
-	-- r:add_neighbors(79, 86, neighbor_rules_const.all)
-	-- r:add_neighbors(79, 96, neighbor_rules_const.all)
-	-- r:add_neighbors(79, 97, neighbor_rules_const.all)
-	-- r:add_neighbors(79, 98, neighbor_rules_const.all)
-	-- r:add_neighbors(79, 99, neighbor_rules_const.all)
-	-- r:add_neighbors(79, 100, neighbor_rules_const.all)
-	-- r:add_neighbors(79, 101, neighbor_rules_const.all)
-	-- r:add_neighbors(79, 102, neighbor_rules_const.all)
-	-- r:add_neighbors(79, 79, neighbor_rules_const.all)
-
-	-- horizontal
-	-- r:add_neighbors(80, 86, neighbor_rules_const.right)
-	-- r:add_neighbors(81, 86, neighbor_rules_const.left)
-
-	-- r:add_neighbors(80, 102, neighbor_rules_const.right)
-	-- r:add_neighbors(81, 102, neighbor_rules_const.left)
-
-	-- r:add_neighbors(96, 96, neighbor_rules_const.right)
-	-- r:add_neighbors(96, 96, neighbor_rules_const.left)
-
-	-- r:add_neighbors(97, 97, neighbor_rules_const.right)
-	-- r:add_neighbors(97, 97, neighbor_rules_const.left)
-
-
-	-- vertical
-	-- r:add_neighbors(80, 80, neighbor_rules_const.above)
-	-- r:add_neighbors(80, 80, neighbor_rules_const.below)
-
-	-- r:add_neighbors(81, 81, neighbor_rules_const.above)
-	-- r:add_neighbors(81, 81, neighbor_rules_const.below)
-
-	-- r:add_neighbors(96, 102, neighbor_rules_const.below)
-	-- r:add_neighbors(97, 102, neighbor_rules_const.above)
-
-	-- r:add_neighbors(96, 86, neighbor_rules_const.above)
-	-- r:add_neighbors(97, 86, neighbor_rules_const.below)
-
-	-- -- corners
-	-- --todo: finish, add corners and edges to list
-	-- r:add_neighbors(82, 80, neighbor_rules_const.above)
-	-- r:add_neighbors(82, 97, neighbor_rules_const.left)
-	-- r:add_neighbors(82, 86, neighbor_rules_const.below)
-	-- r:add_neighbors(82, 86, neighbor_rules_const.right)
-
-	-- r:add_neighbors(83, 81, neighbor_rules_const.above)
-	-- r:add_neighbors(83, 86, neighbor_rules_const.left)
-	-- r:add_neighbors(83, 86, neighbor_rules_const.below)
-	-- r:add_neighbors(83, 97, neighbor_rules_const.right)
-
-	-- r:add_neighbors(98, 86, neighbor_rules_const.above)
-	-- r:add_neighbors(98, 96, neighbor_rules_const.left)
-	-- r:add_neighbors(98, 80, neighbor_rules_const.below)
-	-- r:add_neighbors(98, 86, neighbor_rules_const.right)
-
-	-- r:add_neighbors(99, 86, neighbor_rules_const.above)
-	-- r:add_neighbors(99, 86, neighbor_rules_const.left)
-	-- r:add_neighbors(99, 81, neighbor_rules_const.below)
-	-- r:add_neighbors(99, 96, neighbor_rules_const.right)
-
-	
-	-- r:add_neighbors(84, 81, neighbor_rules_const.above)
-	-- r:add_neighbors(84, 96, neighbor_rules_const.left)
-	-- r:add_neighbors(84, 102, neighbor_rules_const.below)
-	-- r:add_neighbors(84, 102, neighbor_rules_const.right)
-
-	-- r:add_neighbors(85, 81, neighbor_rules_const.above)
-	-- r:add_neighbors(85, 102, neighbor_rules_const.left)
-	-- r:add_neighbors(85, 102, neighbor_rules_const.below)
-	-- r:add_neighbors(85, 96, neighbor_rules_const.right)
-
-	-- r:add_neighbors(100, 102, neighbor_rules_const.above)
-	-- r:add_neighbors(100, 97, neighbor_rules_const.left)
-	-- r:add_neighbors(100, 81, neighbor_rules_const.below)
-	-- r:add_neighbors(100, 102, neighbor_rules_const.right)
-
-	-- r:add_neighbors(101, 102, neighbor_rules_const.above)
-	-- r:add_neighbors(101, 102, neighbor_rules_const.left)
-	-- r:add_neighbors(101, 80, neighbor_rules_const.below)
-	-- r:add_neighbors(101, 97, neighbor_rules_const.right)
-
-
-	
-
-
-	-- r:add_neighbors(96, 96, neighbor_rules_const.left)
-	-- r:add_neighbors(97, 97, neighbor_rules_const.right)
-
-	-- -- vertical
-	-- r:add_neighbors(81, 86, neighbor_rules_const.right)
-	-- r:add_neighbors(80, 86, neighbor_rules_const.left)
-
-	-- r:add_neighbors(81, 102, neighbor_rules_const.left)
-	-- r:add_neighbors(80, 102, neighbor_rules_const.right)
-
-	-- r:add_neighbors(81, 81, neighbor_rules_const.above)
-	-- r:add_neighbors(80, 80, neighbor_rules_const.below)
-
-
-
-	-- r:add_neighbors(102, 65, neighbor_rules_const.all)
-	-- r:add_neighbors(86, 102, neighbor_rules_const.all)
-	-- r:add_neighbors(102,103, neighbor_rules_const.all)
-	-- r:add_neighbors(86, 86, neighbor_rules_const.all)
-	-- r:add_neighbors(86, 87, neighbor_rules_const.all)
-	-- r:add_neighbors(86, 70, neighbor_rules_const.all)
-	-- r:add_neighbors(70, 70, neighbor_rules_const.all)
-	-- r:add_neighbors(70,71, neighbor_rules_const.all)
-	-- r:add_neighbors(71, 71, neighbor_rules_const.all)
 	add(self.rules, r)
 	o.map_tiles = {}
 

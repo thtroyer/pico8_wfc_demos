@@ -48,10 +48,11 @@ function neighbor_rules:add_neighbors(tile1, direction, tile2)
 		add(self.list_of_neighbors_left, neighbors)
 		add(self.list_of_neighbors_right, swapped_neighbors)
 	elseif (direction == neighbor_rules.all) then
-		add(self.list_of_neighbors_above, neighbors)
-		add(self.list_of_neighbors_below, neighbors)
-		add(self.list_of_neighbors_right, neighbors)
-		add(self.list_of_neighbors_left, neighbors)
+		-- recurse to add all directions
+		self:add_neighbors(tile1, neighbor_rules.above, tile2) 
+		self:add_neighbors(tile1, neighbor_rules.below, tile2) 
+		self:add_neighbors(tile1, neighbor_rules.left, tile2) 
+		self:add_neighbors(tile1, neighbor_rules.right, tile2) 
 	end
 end
 
@@ -71,7 +72,6 @@ end
 --
 -- returns void
 function neighbor_rules:deduplicate_rule(rules)
-	log("rules" .. tostring(rules))
 	local newrules = {}
 	local foundrules = {}
 	for k,v in pairs(rules) do
@@ -83,8 +83,6 @@ function neighbor_rules:deduplicate_rule(rules)
 	end
 
 	rules = newrules
-	log("newrules" .. tostring(rules))
-	-- return newrules
 end
 
 -- source : map_tile
@@ -113,13 +111,13 @@ function neighbor_rules:propogate(source, mapdata)
 	end
 
 	if not (y >= 15) then
-		if (self:update(source, tiles, tiles[x+(y+1)*16], neighbor_rules.below)) then
+		if (self:update(source, tiles, tiles[x+(y+1)*16], neighbor_rules.above)) then
 			self:propogate(tiles[x+(y+1)*16], mapdata)
 		end
 	end
 
 	if not (y <= 0) then
-		if(self:update(source, tiles, tiles[x+(y-1)*16], neighbor_rules.above)) then
+		if(self:update(source, tiles, tiles[x+(y-1)*16], neighbor_rules.below)) then
 			self:propogate(tiles[x+(y-1)*16], mapdata)
 		end
 	end
