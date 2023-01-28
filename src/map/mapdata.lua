@@ -13,7 +13,7 @@ function mapdata:new()
 end
 
 
-function mapdata:initialize()
+function mapdata:initialize(tiles)
 	local map_tiles = {}
 
 	for y = 0, 15 do
@@ -22,50 +22,9 @@ function mapdata:initialize()
 			map_tiles[x+y*16].x = x
 			map_tiles[x+y*16].y = y
 
-			-- map_tiles[x+y*16]:add(64)
-			-- map_tiles[x+y*16]:add(65)
-			-- map_tiles[x+y*16]:add(80)
-
-			-- map_tiles[x+y*16]:add(64)
-			-- map_tiles[x+y*16]:add(65)
-			-- map_tiles[x+y*16]:add(66)
-			-- map_tiles[x+y*16]:add(80)
-			-- map_tiles[x+y*16]:add(81)
-			-- map_tiles[x+y*16]:add(82)
-			-- map_tiles[x+y*16]:add(83)
-			-- map_tiles[x+y*16]:add(84)
-			-- map_tiles[x+y*16]:add(85)
-			-- map_tiles[x+y*16]:add(86)
-			-- map_tiles[x+y*16]:add(87)
-			-- map_tiles[x+y*16]:add(96)
-			-- map_tiles[x+y*16]:add(97)
-			-- map_tiles[x+y*16]:add(98)
-			-- map_tiles[x+y*16]:add(99)
-			-- map_tiles[x+y*16]:add(100)
-			-- map_tiles[x+y*16]:add(101)
-			-- map_tiles[x+y*16]:add(102)
-			-- map_tiles[x+y*16]:add(103)
-			-- map_tiles[x+y*16]:add(88)
-			-- map_tiles[x+y*16]:add(89)
-			-- map_tiles[x+y*16]:add(104)
-			-- map_tiles[x+y*16]:add(105)
-
-
-			
-			map_tiles[x+y*16]:add(74)
-			map_tiles[x+y*16]:add(75)
-			map_tiles[x+y*16]:add(76)
-			map_tiles[x+y*16]:add(77)
-			map_tiles[x+y*16]:add(78)
-			map_tiles[x+y*16]:add(90)
-			map_tiles[x+y*16]:add(91)
-			map_tiles[x+y*16]:add(92)
-			map_tiles[x+y*16]:add(93)
-			map_tiles[x+y*16]:add(94)
-			map_tiles[x+y*16]:add(95)
-			map_tiles[x+y*16]:add(106)
-
-
+			for t in all(tiles) do
+				map_tiles[x+y*16]:add(t)
+			end
 		end
 	end
 	self.map_tiles = map_tiles

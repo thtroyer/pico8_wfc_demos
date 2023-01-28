@@ -9,54 +9,17 @@ function mapgen:new()
 
 	self.rules = {}
 
---	local r = neighbor_rules:new()
+	local tilesets = {}
 
-	-- gray numbers, left to right
-	-- 112 - 1; 113 - 2; 114 - 3;
-	-- red numbers, up to down
-	-- 116, 117, 118
-	-- 115 - everything else
-	
-	-- gray numbers
-	-- r:add_neighbors(112, neighbor_rules.left, 113)
-	-- r:add_neighbors(113, neighbor_rules.left, 114)
-	-- r:add_neighbors(115, neighbor_rules.left, 112)
-	-- r:add_neighbors(114, neighbor_rules.left, 115)
+	add(tilesets, 
+		{ 74, 75, 76, 77, 78, 90, 91, 92, 93, 94, 95, 106 }
+	)
 
-	-- -- vertical gray numbers
-	-- r:add_neighbors(112, neighbor_rules.above, 112)
-	-- r:add_neighbors(113, neighbor_rules.above, 113)
-	-- r:add_neighbors(114, neighbor_rules.above, 114)
+	add(tilesets,
+		{ 64, 65, 66, 80, 81, 82, 83, 84, 85, 86, 87, 96, 97, 98, 99, 100, 101, 102, 103, 88, 89, 104, 105}
+	)
 
-	-- -- red numbers
-	-- r:add_neighbors(115, neighbor_rules.above, 116)
-	-- r:add_neighbors(116, neighbor_rules.above, 117)
-	-- r:add_neighbors(117, neighbor_rules.above, 118)
-	-- r:add_neighbors(118, neighbor_rules.above, 115)
-
-	-- -- horizontal red numbers
-	-- r:add_neighbors(116, neighbor_rules.right, 116)
-	-- r:add_neighbors(117, neighbor_rules.right, 117)
-	-- r:add_neighbors(118, neighbor_rules.right, 118)
-
-	-- -- dot filler
-	-- r:add_neighbors(115, neighbor_rules.above, 112)
-	-- r:add_neighbors(115, neighbor_rules.above, 113)
-	-- r:add_neighbors(115, neighbor_rules.above, 114)
-
-	-- r:add_neighbors(115, neighbor_rules.below, 112)
-	-- r:add_neighbors(115, neighbor_rules.below, 113)
-	-- r:add_neighbors(115, neighbor_rules.below, 114)
-
-	-- r:add_neighbors(115, neighbor_rules.left, 116)
-	-- r:add_neighbors(115, neighbor_rules.left, 117)
-	-- r:add_neighbors(115, neighbor_rules.left, 118)
-
-	-- r:add_neighbors(115, neighbor_rules.right, 116)
-	-- r:add_neighbors(115, neighbor_rules.right, 117)
-	-- r:add_neighbors(115, neighbor_rules.right, 118)
-
-	-- r:add_neighbors(115, neighbor_rules.all, 115)
+	self.tiles = rnd(tilesets)
 
 	local count_rule = count_rules:new()
 	add(o.rules, count_rule)
@@ -70,11 +33,8 @@ end
 function mapgen:find_neighboring_tiles()
 	local r = neighbor_rules:new()
 
-	-- local tiles = { 64, 65, 66, 80, 81, 82, 83, 84, 85, 86, 87, 96, 97, 98, 99, 100, 101, 102, 103, 88, 89, 104, 105}
-	local tiles = { 74, 75, 76, 77, 78, 90, 91, 92, 93, 94, 95, 106 }
-
-	for t1 in all(tiles) do
-		for t2 in all(tiles) do
+	for t1 in all(self.tiles) do
+		for t2 in all(self.tiles) do
 			if (get_sprite_pixels(t1, sides.bottom) == get_sprite_pixels(t2, sides.top)) then
 				r:add_neighbors(t1, neighbor_rules.above, t2)
 			end
@@ -96,13 +56,13 @@ function mapgen:find_neighboring_tiles()
 end
 
 function mapgen:generate()
-	self:initialize()
+	self:initialize(self.tiles)
 	self:find_neighboring_tiles()
 	self:collapse()
 end
 
-function mapgen:initialize()
-	self.mapdata:initialize()
+function mapgen:initialize(tiles)
+	self.mapdata:initialize(tiles)
 end
 
 function mapgen:collapse()
