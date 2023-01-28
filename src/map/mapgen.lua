@@ -70,7 +70,8 @@ end
 function mapgen:find_neighboring_tiles()
 	local r = neighbor_rules:new()
 
-	local tiles = { 64, 65, 66, 80, 81, 82, 83, 84, 85, 86, 87, 96, 97, 98, 99, 100, 101, 102, 103, 88, 89, 104, 105}
+	-- local tiles = { 64, 65, 66, 80, 81, 82, 83, 84, 85, 86, 87, 96, 97, 98, 99, 100, 101, 102, 103, 88, 89, 104, 105}
+	local tiles = { 74, 75, 76, 77, 78, 90, 91, 92, 93, 94, 95, 106 }
 
 	for t1 in all(tiles) do
 		for t2 in all(tiles) do
