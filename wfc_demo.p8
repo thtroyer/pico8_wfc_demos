@@ -32,8 +32,8 @@ __lua__
 
 -->8
 -- mapgen rules
-#include src/map/neighbor_rules.lua
-#include src/map/count_rules.lua
+#include src/map/rules/neighbor_rules.lua
+#include src/map/rules/count_rules.lua
 
 -->8
 -- sprite lookup
