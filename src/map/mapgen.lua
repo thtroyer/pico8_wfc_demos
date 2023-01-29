@@ -12,11 +12,11 @@ function mapgen:new()
 	local tilesets = {}
 
 	add(tilesets, 
-		{ 74, 75, 76, 77, 78, 90, 91, 92, 93, 94, 95, 106 }
+		{ 74, 74, 74, 75, 76, 77, 78, 90, 91, 92, 93, 94, 95, 106 }
 	)
 
 	add(tilesets,
-		{ 64, 65, 66, 80, 81, 82, 83, 84, 85, 86, 87, 96, 97, 98, 99, 100, 101, 102, 103, 88, 89, 104, 105}
+		{ 64, 64, 64, 64, 64, 64, 64, 65, 66, 80, 81, 82, 83, 84, 85, 86, 87, 96, 97, 98, 99, 100, 101, 102, 103, 88, 89, 104, 105}
 	)
 
 	self.tiles = rnd(tilesets)
@@ -72,6 +72,11 @@ function mapgen:collapse()
 	while not (#low_tiles == 0) do
 		-- find lowest entropy
 		local low_ent_tile = rnd(low_tiles)
+		-- log("map tiles")
+		-- log(tostring(self.mapdata))
+
+		-- log("low_tiles:")
+		-- log(tostring(low_tiles))
 
 		low_ent_tile:collapse()
 
@@ -87,17 +92,6 @@ function mapgen:draw()
 	for x = 0,15, 1 do
 		for y = 0, 15, 1 do
 			mset(x, y, map_tiles[x+y*16].tile)
-		end
-	end
-end
-
--- debug
-function mapgen:print_all_states(tiles)
-    local tiles = self.mapdata.map_tiles
-	for t in all(tiles) do
-		local states = ""
-		for s in all(t.list_of_tiles) do
-			states = states .. s .. ", "
 		end
 	end
 end

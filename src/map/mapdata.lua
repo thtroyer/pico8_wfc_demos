@@ -60,7 +60,9 @@ function mapdata:lowest()
 	local lowest_entropy = 9999
 	local l_list = {}
 
-	for t in all(self.map_tiles) do
+	-- don't use all(...) because it won't find index 0
+	for i=0,255 do
+		local t=self.map_tiles[i]
 		if not t:is_collapsed() and #t.list_of_tiles ~= 0 then
 			local ent = t:entropy()
 			if ent == lowest_entropy then
