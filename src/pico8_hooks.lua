@@ -1,19 +1,20 @@
 
-mapgen = {}
+mg = {}
 
 -- pico-8 hooks
 function _init()
 	clearlog()
 
-	mapgen = mapgen:new()
-	mapgen:initialize()
-	mapgen:find_neighboring_tiles()
+	mg = mapgen:new()
+	mg:initialize()
+	mg:find_neighboring_tiles()
+	-- mg:collapse()
 end
 
 function _update()
 	handle_controllers()
-	mapgen:collapse_a_tile()
-	-- mapgen:draw()
+	mg:collapse_a_tile()
+	mg:draw()
 end
 
 function _draw()

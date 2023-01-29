@@ -56,18 +56,20 @@ function mapgen:find_neighboring_tiles()
 end
 
 function mapgen:generate()
-	self:initialize(self.tiles)
+	self:initialize()
 	self:find_neighboring_tiles()
 	self:collapse()
 end
 
-function mapgen:initialize(tiles)
-	self.mapdata:initialize(tiles)
+function mapgen:initialize()
+	self.mapdata:initialize(self.tiles)
 end
 
 function mapgen:collapse()
 	local resolved = false
 	local low_tiles = self.mapdata:lowest()
+
+	log("tiles: " .. #low_tiles)
 
 	while not (#low_tiles == 0) do
 		-- find lowest entropy
@@ -83,13 +85,17 @@ function mapgen:collapse()
 		-- propagate tile changes
 		self:propagate(low_ent_tile)
 
+		low_tiles = self.mapdata:lowest()
+		log("tiles: " .. #low_tiles)
 	end
 end
 
 function mapgen:collapse_a_tile()
+	log("collapse_a_tile")
 	if (self:iscollapsed()) then
 		return
 	end
+	log("collapse_a_tile2")
 
 	local low_tiles = self.mapdata:lowest()
 
@@ -104,6 +110,9 @@ function mapgen:iscollapsed()
 end
 
 function mapgen:draw()
+	-- todo 
+	-- this method current fails
+	log(tostring(self.mapdata))
 	local map_tiles = self.mapdata.map_tiles
 	for x = 0,15, 1 do
 		for y = 0, 15, 1 do
