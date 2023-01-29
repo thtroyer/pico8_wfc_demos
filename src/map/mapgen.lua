@@ -20,6 +20,8 @@ function mapgen:new()
 	)
 
 	self.tiles = rnd(tilesets)
+	self.genstep = 0
+	self.collapsed = false
 
 	local count_rule = count_rules:new()
 	add(o.rules, count_rule)
@@ -69,16 +71,9 @@ function mapgen:collapse()
 	local resolved = false
 	local low_tiles = self.mapdata:lowest()
 
-	log("tiles: " .. #low_tiles)
-
 	while not (#low_tiles == 0) do
 		-- find lowest entropy
 		local low_ent_tile = rnd(low_tiles)
-		-- log("map tiles")
-		-- log(tostring(self.mapdata))
-
-		-- log("low_tiles:")
-		-- log(tostring(low_tiles))
 
 		low_ent_tile:collapse()
 
@@ -86,33 +81,69 @@ function mapgen:collapse()
 		self:propagate(low_ent_tile)
 
 		low_tiles = self.mapdata:lowest()
-		log("tiles: " .. #low_tiles)
 	end
 end
 
 function mapgen:collapse_a_tile()
-	log("collapse_a_tile")
 	if (self:iscollapsed()) then
 		return
 	end
-	log("collapse_a_tile2")
 
 	local low_tiles = self.mapdata:lowest()
 
 	local low_ent_tile = rnd(low_tiles)
 	low_ent_tile:collapse()
 	self:propagate(low_ent_tile)
-	mapgen:draw()
+	self:draw()
+end
+
+function mapgen:collapse_a_tile_slow()
+	if (self:iscollapsed()) then
+		return
+	end
+
+	if (self.genstep == 0) then
+		log("genstep " .. self.genstep)
+		local low_tiles = self.mapdata:lowest()
+
+		local low_ent_tile = rnd(low_tiles)
+		self.genstep = 1
+		self.gendata = low_ent_tile
+	end
+
+	if (self.genstep == 1) then
+		local low_ent_tile = self.gendata
+		low_ent_tile:collapse()
+		self.genstep = 2
+		self.gendata = low_ent_tile
+		return
+	end
+
+	if (self.genstep == 2) then
+		log("genstep " .. self.genstep)
+		low_ent_tile = self.gendata
+		self.gendata = nil
+		self:propagate(low_ent_tile)
+		self:draw()
+		self.genstep = 0
+		return
+	end
 end
 
 function mapgen:iscollapsed()
-	return (#(self.mapdata:lowest()) == 0)
+	if (self.collapsed) return true
+
+	local c = (#(self.mapdata:lowest()) == 0)
+	if (c) then
+		log("true")
+		self.collapsed = true
+		return true
+	end
+	log("false")
+	return false
 end
 
 function mapgen:draw()
-	-- todo 
-	-- this method current fails
-	log(tostring(self.mapdata))
 	local map_tiles = self.mapdata.map_tiles
 	for x = 0,15, 1 do
 		for y = 0, 15, 1 do

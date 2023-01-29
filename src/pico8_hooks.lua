@@ -13,8 +13,9 @@ end
 
 function _update()
 	handle_controllers()
-	mg:collapse_a_tile()
-	mg:draw()
+	-- mg:collapse_a_tile_slow()
+	mg:collapse()
+	-- mg:draw()
 end
 
 function _draw()
