@@ -66,8 +66,10 @@ function mapdata:lowest()
 		if not t:is_collapsed() and #t.list_of_tiles ~= 0 then
 			local ent = t:entropy()
 			if ent == lowest_entropy then
+				log("hit")
 				add(l_list, t)
 			elseif ent < lowest_entropy then
+				log("hit")
 				lowest_entropy = ent
 				l_list = {}
 				add(l_list, t)

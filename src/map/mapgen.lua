@@ -83,8 +83,24 @@ function mapgen:collapse()
 		-- propagate tile changes
 		self:propagate(low_ent_tile)
 
-		low_tiles = self.mapdata:lowest()
 	end
+end
+
+function mapgen:collapse_a_tile()
+	if (self:iscollapsed()) then
+		return
+	end
+
+	local low_tiles = self.mapdata:lowest()
+
+	local low_ent_tile = rnd(low_tiles)
+	low_ent_tile:collapse()
+	self:propagate(low_ent_tile)
+	mapgen:draw()
+end
+
+function mapgen:iscollapsed()
+	return (#(self.mapdata:lowest()) == 0)
 end
 
 function mapgen:draw()
