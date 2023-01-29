@@ -24,7 +24,9 @@ function count_rules:propagate(source, mapdata)
 
             if (count <= 0) then
                 for m in all(mapdata.map_tiles) do
-                    m:remove(k)
+                    if not m:is_collapsed() then
+                        m:remove(k)
+                    end
                 end
             end
             self.counts[k] = count
