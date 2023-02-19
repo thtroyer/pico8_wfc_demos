@@ -33,6 +33,15 @@ function tostring(var)
 	return "unknown"
 end
 
+function is_in(table, value)
+	for k,v in pairs(table) do
+		if value == v then
+			return true
+		end
+	end
+	return false
+end
+
 function random(minimum, maximum)
 	return rnd(maximum - minimum) + minimum
 end

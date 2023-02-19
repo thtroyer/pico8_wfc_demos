@@ -2,7 +2,7 @@
 -- mapgen
 mapgen = {}
 
-function mapgen:new()
+function mapgen:new(tileset)
 	local o = {}
 	setmetatable(o, self)
 	self.__index = self
@@ -11,15 +11,20 @@ function mapgen:new()
 
 	local tilesets = {}
 
-	add(tilesets, 
-		{ 74, 74, 74, 75, 76, 77, 78, 90, 91, 92, 93, 94, 95, 106 }
-	)
+	-- add(tilesets, 
+	-- 	{ 74, 74, 74, 75, 76, 77, 78, 90, 91, 92, 93, 94, 95, 106 }
+	-- )
 
-	add(tilesets,
-		{ 64, 64, 64, 64, 64, 64, 64, 65, 66, 80, 81, 82, 83, 84, 85, 86, 87, 96, 97, 98, 99, 100, 101, 102, 103, 88, 89, 104, 105}
-	)
+	-- add(tilesets,
+	-- 	{ 64, 64, 64, 64, 64, 64, 64, 65, 66, 80, 81, 82, 83, 84, 85, 86, 87, 96, 97, 98, 99, 100, 101, 102, 103, 88, 89, 104, 105}
+	-- )
+	-- add(tilesets,
+		-- { 213, 214, 215, 216, 229, 230, 231, 232, 245, 256, 257, 258}
+	-- )
 
-	self.tiles = rnd(tilesets)
+	-- self.tiles = rnd(tilesets)
+	self.tiles = tileset
+
 	self.genstep = 0
 	self.collapsed = false
 
@@ -32,6 +37,7 @@ function mapgen:new()
 	return o
 end
 
+-- todo: move this out of mapgen object
 function mapgen:find_neighboring_tiles()
 	local r = neighbor_rules:new()
 
@@ -57,6 +63,31 @@ function mapgen:find_neighboring_tiles()
 	add(self.rules, r)
 end
 
+-- todo: move this out of mapgen object
+-- todo: this doesn't work yet
+-- todo: find duplicate tiles in example
+function mapgen:generate_neighbor_rules_by_example(list_of_tiles)
+	local r = neighbor_rules:new()
+	for t in all(list_of_tiles) do
+		--t=list_of_tiles[i]
+		if is_in(list_of_tiles, t-15) then
+			r:add_neighbors(t, neighbor_rules.below, t-15)
+		end
+		if is_in(list_of_tiles, t+15) then
+			r:add_neighbors(t, neighbor_rules.above, t+15)
+		end
+		if is_in(list_of_tiles, t-1) then
+			r:add_neighbors(t, neighbor_rules.right, t-1)
+		end
+		if is_in(list_of_tiles, t+1) then
+			r:add_neighbors(t, neighbor_rules.left, t+1)
+		end
+	end
+
+	r:deduplicate_rules()
+	add(self.rules, r)
+end
+
 function mapgen:generate()
 	self:initialize()
 	self:find_neighboring_tiles()
@@ -67,6 +98,7 @@ function mapgen:initialize()
 	self.mapdata:initialize(self.tiles)
 end
 
+-- collapse all tiles
 function mapgen:collapse()
 	local resolved = false
 	local low_tiles = self.mapdata:lowest()
